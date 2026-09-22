@@ -11,6 +11,10 @@
   --f-brand:'Unbounded',var(--f-sans);
   --ease:cubic-bezier(.16,1,.3,1);
   --pad:22px; --maxw:1560px; --docp:0;
+  --sa-top:env(safe-area-inset-top,0px);
+  --sa-bot:env(safe-area-inset-bottom,0px);
+  --navH:calc(3.9rem + var(--sa-top));
+  --sceneH:46svh;
   color-scheme:dark;
 }
 @media (min-width:860px){ :root{ --pad:56px } }
@@ -57,14 +61,14 @@ p{margin:0}
 .lede{color:var(--fg-muted);font-size:clamp(.9rem,3.4vw,1.12rem);line-height:1.62;max-width:34em}
 
 /* ========================================================== progress bar */
-.progress{position:fixed;inset:0 0 auto;height:2px;z-index:80;background:rgba(207,195,242,.12)}
+.progress{position:fixed;inset:var(--sa-top) 0 auto;height:2px;z-index:80;background:rgba(207,195,242,.12)}
 .progress span{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(var(--docp));background:linear-gradient(90deg,var(--violet),var(--gold))}
 
 /* =================================================================== nav */
 .nav{
-  position:fixed;inset:2px 0 auto;z-index:70;
+  position:fixed;inset:0 0 auto;z-index:70;
   display:flex;align-items:center;justify-content:space-between;gap:1.5rem;
-  padding:1rem var(--pad);transition:background .35s,backdrop-filter .35s,border-color .35s;
+  padding:calc(1rem + var(--sa-top)) max(var(--pad),env(safe-area-inset-right,0px)) 1rem max(var(--pad),env(safe-area-inset-left,0px));transition:background .35s,backdrop-filter .35s,border-color .35s;
   border-bottom:1px solid transparent;
 }
 .nav--solid{background:rgba(21,3,52,.78);backdrop-filter:blur(16px);border-bottom-color:rgba(207,195,242,.14)}
@@ -78,7 +82,7 @@ p{margin:0}
 .nav__cta.btn{display:none;padding:.78rem 1.35rem;font-size:.84rem;white-space:nowrap}
 .nav__menu{padding:.68rem 1.1rem;font-size:.82rem}
 .nav__sheet{
-  position:absolute;top:100%;left:.7rem;right:.7rem;
+  position:absolute;top:100%;left:.7rem;right:.7rem;max-height:calc(100svh - var(--navH) - 2rem);overflow:auto;
   display:grid;gap:.85rem;padding:1.45rem;border-radius:26px;
   background:var(--cream);color:var(--ink);box-shadow:0 34px 70px -22px rgba(10,0,30,.75);
 }
@@ -111,7 +115,7 @@ p{margin:0}
 
 /* sticky bottom CTA, grail-style */
 .dock{
-  position:fixed;left:50%;bottom:1.1rem;z-index:65;transform:translateX(-50%);
+  position:fixed;left:50%;bottom:calc(1.1rem + var(--sa-bot));z-index:65;transform:translateX(-50%);
   padding:.92rem 1.7rem;border-radius:999px;font-weight:600;font-size:.9rem;
   background:var(--gold);color:#22083a;
   box-shadow:0 18px 44px -14px rgba(0,0,0,.7);
@@ -178,12 +182,13 @@ p{margin:0}
 .dots__d--on{width:36px}
 .counter{position:absolute;right:var(--pad);bottom:1.8rem;z-index:3;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;color:var(--muted)}
 @media (max-width:979px){
-  .chapters__sticky{display:block;background:var(--deep)}
-  .chapters__bg{inset:0 0 auto;height:54svh;background-size:240% auto;background-position:55% 30%;background-repeat:no-repeat;transform:none}
-  .chapters__veil{inset:0 0 auto;height:54svh;
-    background:linear-gradient(to bottom,rgba(21,3,52,.12) 0%,rgba(21,3,52,.28) 46%,rgba(21,3,52,.9) 78%,var(--deep) 100%)}
-  .chapters__wrap{position:absolute;left:0;right:0;bottom:4rem}
-  .chapters__slot{left:30%;top:5%;width:44%;height:31%}
+  .chapters__sticky{display:flex;flex-direction:column;background:var(--deep)}
+  .chapters__bg{inset:0 0 auto;height:var(--sceneH);background-size:240% auto;background-position:55% 34%;background-repeat:no-repeat;transform:none}
+  .chapters__veil{inset:0 0 auto;height:var(--sceneH);
+    background:linear-gradient(to bottom,rgba(21,3,52,.10) 0%,rgba(21,3,52,.26) 48%,rgba(21,3,52,.9) 80%,var(--deep) 100%)}
+  .chapters__wrap{position:relative;margin-top:var(--sceneH);flex:1;display:flex;align-items:center;padding-bottom:3.25rem}
+  .chapters__slot{left:26%;top:calc(var(--navH) + 1.6rem);width:48%;
+                  height:calc(var(--sceneH) - var(--navH) - 3.2rem)}
   .panel{gap:.7rem}
   .specs__row{padding:.62rem 0}
   .panel .row{margin-top:1rem}
@@ -321,7 +326,11 @@ p{margin:0}
   filter:drop-shadow(0 30px 50px rgba(10,0,30,.6));
 }
 .shirt__img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
-.shirt__img--dirty{filter:saturate(calc(1 - var(--panelp,0) * .25)) brightness(calc(1 - var(--panelp,0) * .06))}
+.shirt__img--dirty{
+  filter:saturate(calc(1 - var(--panelp,0) * .25)) brightness(calc(1 - var(--panelp,0) * .06));
+  -webkit-mask-image:linear-gradient(to bottom,transparent calc(var(--panelp,0) * 142% - 22%),#000 calc(var(--panelp,0) * 142%));
+  mask-image:linear-gradient(to bottom,transparent calc(var(--panelp,0) * 142% - 22%),#000 calc(var(--panelp,0) * 142%));
+}
 .shirt__img--clean{
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(var(--panelp,0) * 142% - 22%),transparent calc(var(--panelp,0) * 142%));
   mask-image:linear-gradient(to bottom,#000 calc(var(--panelp,0) * 142% - 22%),transparent calc(var(--panelp,0) * 142%));
@@ -399,9 +408,8 @@ p{margin:0}
    The pinned product chapter has to fit a scene, an info panel and a CTA row in
    one screen; on short viewports the copy would otherwise ride up into the pack. */
 @media (max-width:979px) and (max-height:700px){
-  .chapters__bg,.chapters__veil{height:42svh}
-  .chapters__slot{top:2%;height:22%}
-  .chapters__wrap{bottom:3.1rem}
+  :root{--sceneH:40svh}
+  .chapters__wrap{padding-bottom:2.7rem}
   .panel__name{font-size:clamp(1.65rem,7.6vw,2.1rem)}
   .panel__desc{font-size:.82rem;line-height:1.48}
   .specs__row{padding:.44rem 0}
