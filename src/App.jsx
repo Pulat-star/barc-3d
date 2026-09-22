@@ -244,7 +244,7 @@ export default function App() {
 
         <div className="stack">
           <Panel id="qollash" n="02" label="SOVUQ SUV" bg={SCENES.room} panelRef={setPanel(0)}>
-            <div className="lay lay--split">
+            <div className="lay lay--shirt">
               <div className="lay__copy">
                 <Split as="h2" text="SOVUQ SUVDA HAM DOG‘ QOLMAYDI" className="display display--md" step={60} />
                 <p className="lede" data-rv="up" style={{ '--d': '380ms' }}>
@@ -259,6 +259,21 @@ export default function App() {
                 <div className="row" data-rv="up" style={{ '--d': '760ms' }}>
                   <a className="btn btn--violet" href="#katalog">Katalogni ko‘rish</a>
                 </div>
+              </div>
+
+              <div className="shirt" data-rv="scale" style={{ '--d': '240ms' }}>
+                <div className="shirt__stage">
+                  <img className="shirt__img shirt__img--dirty" src={SCENES.shirtDirty} alt="" loading="lazy" />
+                  <img className="shirt__img shirt__img--clean" src={SCENES.shirtClean} alt="" loading="lazy" />
+                  <span className="shirt__sweep" aria-hidden="true" />
+                  <span className="shirt__foam" aria-hidden="true">
+                    {Array.from({ length: 10 }, (_, i) => <i key={i} style={{ '--i': i }} />)}
+                  </span>
+                </div>
+                <p className="shirt__tag" aria-hidden="true">
+                  <span className="shirt__tag--a">DOG‘LI</span>
+                  <span className="shirt__tag--b">TOZA</span>
+                </p>
               </div>
             </div>
           </Panel>

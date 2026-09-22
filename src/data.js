@@ -45,7 +45,9 @@ export const SCENES = {
   machine: asset('scenes/machine.jpg'),
   room: asset('scenes/room.jpg'),
   towels: asset('scenes/towels.jpg'),
-  studio: asset('scenes/studio.jpg')
+  studio: asset('scenes/studio.jpg'),
+  shirtDirty: asset('scenes/shirt-dirty.webp'),
+  shirtClean: asset('scenes/shirt-clean.webp')
 }
 
 export const DRACO_PATH = asset('draco/gltf/')

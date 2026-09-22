@@ -93,10 +93,22 @@ function tick() {
 
   // grail-style stacking: each sticky panel recedes as the next one covers it
   for (let i = 0; i < panels.length; i++) {
+    const el = panels[i]
+    const r = el.getBoundingClientRect()
+
+    // How far we are through this panel, 0..1.
+    // Pinned panels (desktop) scrub across their own dwell; on mobile they are
+    // plain blocks, so scrub across their travel through the viewport instead.
+    const dwell = r.height - journey.vh
+    const p = dwell > 40
+      ? -r.top / dwell
+      : (journey.vh * 0.75 - r.top) / (journey.vh * 1.05)
+    el.style.setProperty('--panelp', clamp(p).toFixed(4))
+
     const next = panels[i + 1]
-    if (!next) { panels[i].style.setProperty('--recede', '0'); continue }
+    if (!next) { el.style.setProperty('--recede', '0'); continue }
     const top = next.getBoundingClientRect().top
-    panels[i].style.setProperty('--recede', clamp(1 - top / Math.max(journey.vh, 1)).toFixed(3))
+    el.style.setProperty('--recede', clamp(1 - top / Math.max(journey.vh, 1)).toFixed(3))
   }
 
   const idx = Math.min(chapterCount - 1, Math.max(0, Math.floor(journey.chapP - 0.001 + 0.35)))

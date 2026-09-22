@@ -297,3 +297,64 @@ p{margin:0}
   .footer__wrap{grid-template-columns:1fr auto auto;align-items:center}
   .footer__contact{justify-items:end;text-align:right}
 }
+
+/* ====================================================== dirty → clean shirt
+   Driven entirely by --panelp, the panel's own scroll progress, so the
+   transformation scrubs with the wheel and never re-renders React. */
+.lay--shirt{display:grid;gap:clamp(1.6rem,3vw,3rem);align-items:center}
+@media (min-width:980px){ .lay--shirt{grid-template-columns:minmax(0,1fr) minmax(0,.82fr)} }
+@media (max-width:979px){
+  .chapterbar{top:1.5rem}
+  .lay--shirt{gap:1.2rem}
+  .shirt__stage{max-width:min(62vw,270px)}
+  .shirt__tag{font-size:.62rem}
+}
+
+.shirt{position:relative;display:grid;justify-items:center;gap:1rem;perspective:1400px}
+.shirt__stage{
+  position:relative;width:100%;max-width:clamp(230px,32vw,430px);aspect-ratio:3/4;
+  overflow:hidden;
+  transform:rotateY(calc((1 - var(--panelp,0)) * -10deg)) rotateX(calc(var(--panelp,0) * 4deg - 1deg)) scale(calc(.965 + var(--panelp,0) * .045));
+  filter:drop-shadow(0 30px 50px rgba(10,0,30,.6));
+}
+.shirt__img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.shirt__img--dirty{filter:saturate(calc(1 - var(--panelp,0) * .25)) brightness(calc(1 - var(--panelp,0) * .06))}
+.shirt__img--clean{
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(var(--panelp,0) * 142% - 22%),transparent calc(var(--panelp,0) * 142%));
+  mask-image:linear-gradient(to bottom,#000 calc(var(--panelp,0) * 142% - 22%),transparent calc(var(--panelp,0) * 142%));
+  filter:brightness(1.05);
+}
+/* glowing wipe edge that travels down the shirt */
+.shirt__sweep{
+  position:absolute;left:-6%;right:-6%;height:16%;pointer-events:none;
+  top:calc(var(--panelp,0) * 130% - 16%);
+  background:linear-gradient(to bottom,transparent,rgba(232,184,75,.55) 45%,rgba(255,255,255,.85) 62%,transparent);
+  filter:blur(6px);
+  opacity:clamp(0,calc(min(var(--panelp,0) * 8,(1 - var(--panelp,0)) * 9)),1);
+}
+.shirt__stage::after{
+  content:'';position:absolute;inset:0;pointer-events:none;border-radius:10%;
+  background:radial-gradient(60% 45% at 50% 42%,rgba(207,195,242,.20),transparent 70%);
+  opacity:calc(var(--panelp,0) * .9);
+}
+/* soap foam rising as it cleans */
+.shirt__foam{position:absolute;inset:0;pointer-events:none;opacity:clamp(0,calc(var(--panelp,0) * 3),1)}
+.shirt__foam i{
+  position:absolute;border-radius:50%;
+  width:calc(5px + (var(--i) % 4) * 4px);aspect-ratio:1;
+  left:calc(12% + var(--i) * 8%);bottom:6%;
+  background:radial-gradient(circle at 34% 32%,rgba(255,255,255,.95),rgba(207,195,242,.28));
+  animation:foam calc(4.2s + var(--i) * .45s) ease-in-out infinite;
+  animation-delay:calc(var(--i) * -.55s);
+}
+@keyframes foam{
+  0%{transform:translateY(0) scale(.6);opacity:0}
+  22%{opacity:.85}
+  100%{transform:translateY(-190px) scale(1.15);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){ .shirt__foam{display:none} .shirt__stage{transform:none} }
+
+.shirt__tag{position:relative;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.22em;height:1.2em}
+.shirt__tag span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;transition:opacity .3s linear}
+.shirt__tag--a{color:#E7A0A0;opacity:clamp(0,calc((.58 - var(--panelp,0)) * 5),1)}
+.shirt__tag--b{color:var(--gold-3);opacity:clamp(0,calc((var(--panelp,0) - .52) * 5),1)}
