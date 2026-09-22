@@ -17,13 +17,15 @@ export const journey = {
   exit: 0,    // 1 once the chapter stack is behind us
   docP: 0,    // whole-page progress, for the top bar
   active: 0,
-  pointer: { x: 0, y: 0 }
+  pointer: { x: 0, y: 0 },
+  slots: { hero: null, chapter: null }
 }
 
 if (typeof window !== 'undefined') window.__journey = journey
 
 let els = { hero: null, chapters: null }
 let panels = []
+let slots = {}
 let box = { heroTop: 0, heroH: 0, chapTop: 0, chapH: 0 }
 let listeners = new Set()
 let raf = 0
@@ -38,6 +40,12 @@ export function registerSections(hero, chapters) {
 
 export function registerPanels(list) {
   panels = list.filter(Boolean)
+}
+
+// The 3D packs are anchored to real layout boxes rather than hard-coded screen
+// fractions, so they land correctly at any viewport size.
+export function registerSlots(map) {
+  slots = map || {}
 }
 
 export function onActiveChange(fn) {
@@ -109,6 +117,19 @@ function tick() {
     if (!next) { el.style.setProperty('--recede', '0'); continue }
     const top = next.getBoundingClientRect().top
     el.style.setProperty('--recede', clamp(1 - top / Math.max(journey.vh, 1)).toFixed(3))
+  }
+
+  for (const key of ['hero', 'chapter']) {
+    const el = slots[key]
+    if (!el) { journey.slots[key] = null; continue }
+    const r = el.getBoundingClientRect()
+    if (r.width < 1 || r.height < 1) { journey.slots[key] = null; continue }
+    journey.slots[key] = {
+      cx: (r.left + r.width / 2) / journey.vw,
+      cy: (r.top + r.height / 2) / journey.vh,
+      w: r.width / journey.vw,
+      h: r.height / journey.vh
+    }
   }
 
   const idx = Math.min(chapterCount - 1, Math.max(0, Math.floor(journey.chapP - 0.001 + 0.35)))

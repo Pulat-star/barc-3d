@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Scene3D from './components/Scene3D'
 import { Split, Chapter } from './components/Type'
 import { PRODUCTS, SCENES, NAV_LINKS } from './data'
-import { startJourney, registerSections, registerPanels, onActiveChange } from './journey'
+import { startJourney, registerSections, registerPanels, registerSlots, onActiveChange } from './journey'
 import { observeReveals } from './reveal'
 
 /* ------------------------------------------------------------------ nav */
@@ -48,7 +48,7 @@ function Nav() {
 }
 
 /* ----------------------------------------------------------------- hero */
-function Hero({ innerRef }) {
+function Hero({ innerRef, slotRef }) {
   return (
     <section className="hero" id="top" ref={innerRef}>
       <div className="hero__glow" aria-hidden="true" />
@@ -74,14 +74,14 @@ function Hero({ innerRef }) {
         </div>
       </div>
 
-      <div className="hero__slot" aria-hidden="true" />
+      <div className="hero__slot" ref={slotRef} aria-hidden="true" />
       <p className="hero__hint" data-rv="up" style={{ '--d': '900ms' }}>UYGA KIRING ↓</p>
     </section>
   )
 }
 
 /* ------------------------------------------------- pinned product story */
-function Chapters({ innerRef }) {
+function Chapters({ innerRef, slotRef }) {
   const [active, setActive] = useState(0)
   useEffect(() => onActiveChange(setActive), [])
   useEffect(() => { observeReveals() }, [active])
@@ -92,6 +92,7 @@ function Chapters({ innerRef }) {
       <div className="chapters__sticky">
         <div className="chapters__bg" style={{ backgroundImage: `url(${SCENES.machine})` }} />
         <div className="chapters__veil" />
+        <div className="chapters__slot" ref={slotRef} aria-hidden="true" />
         <Chapter n="01" label="MAHSULOTLAR" />
 
         <div className="wrap chapters__wrap">
@@ -212,12 +213,15 @@ export default function App() {
   const heroRef = useRef(null)
   const chapRef = useRef(null)
   const [atForm, setAtForm] = useState(false)
+  const heroSlot = useRef(null)
+  const chapSlot = useRef(null)
   const panelRefs = useRef([])
   const setPanel = (i) => (el) => { panelRefs.current[i] = el }
 
   useEffect(() => {
     registerSections(heroRef.current, chapRef.current)
     registerPanels(panelRefs.current)
+    registerSlots({ hero: heroSlot.current, chapter: chapSlot.current })
     observeReveals()
     const stop = startJourney(PRODUCTS.length)
     const t = setTimeout(() => observeReveals(), 400)
@@ -239,8 +243,8 @@ export default function App() {
       <Scene3D />
 
       <main>
-        <Hero innerRef={heroRef} />
-        <Chapters innerRef={chapRef} />
+        <Hero innerRef={heroRef} slotRef={heroSlot} />
+        <Chapters innerRef={chapRef} slotRef={chapSlot} />
 
         <div className="stack">
           <Panel id="qollash" n="02" label="SOVUQ SUV" bg={SCENES.room} panelRef={setPanel(0)}>

@@ -8,7 +8,6 @@ export function Split({ text, as: Tag = 'span', className = '', start = 0, step 
       {words.map((w, i) => (
         <span className="split__w" key={`${w}-${i}`} data-rv="word" style={{ '--d': `${start + i * step}ms` }}>
           <span className="split__i">{w}</span>
-          {i < words.length - 1 ? ' ' : null}
         </span>
       ))}
     </Tag>

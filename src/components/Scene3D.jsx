@@ -71,23 +71,28 @@ function useNormalisedModel(url, textureUrl) {
   }, [scene, art])
 }
 
-const LAYOUT = {
-  desktop: {
-    hero: [
-      { f: [0.500, 0.755], s: 1.88, r: 0 },
-      { f: [0.335, 0.780], s: 1.40, r: 0.16 },
-      { f: [0.665, 0.780], s: 1.40, r: -0.16 }
-    ],
-    chapter: { f: [0.605, 0.445], s: 2.45 }
-  },
-  mobile: {
-    hero: [
-      { f: [0.500, 0.775], s: 1.18, r: 0 },
-      { f: [0.255, 0.796], s: 0.89, r: 0.16 },
-      { f: [0.745, 0.796], s: 0.89, r: -0.16 }
-    ],
-    chapter: { f: [0.545, 0.187], s: 0.95 }
-  }
+// Fallbacks only — the real placement comes from the measured layout slots.
+const FALLBACK = {
+  desktop: { hero: { cx: 0.5, cy: 0.755, w: 0.62, h: 0.40 }, chapter: { cx: 0.605, cy: 0.445, w: 0.34, h: 0.50 } },
+  mobile:  { hero: { cx: 0.5, cy: 0.775, w: 0.92, h: 0.26 }, chapter: { cx: 0.545, cy: 0.187, w: 0.6, h: 0.24 } }
+}
+
+// A pack's world scale equals its height as a fraction of the visible frustum.
+const VISIBLE = 2 * Math.tan((35 * Math.PI) / 360) * 8
+const PACK_ASPECT = 0.76 // width / height of a pouch
+
+// A slot can be very tall on a big phone; cap the pack so the row still fits
+// across the viewport instead of bursting out of the sides.
+function fitHeight(slotH, slotW, maxWidthFrac) {
+  const aspect = journey.vw / Math.max(journey.vh, 1)
+  const byWidth = (Math.min(slotW, maxWidthFrac) * aspect) / PACK_ASPECT
+  return Math.min(slotH, byWidth)
+}
+
+function slotFor(kind) {
+  const measured = journey.slots?.[kind]
+  if (measured) return measured
+  return (journey.isMobile ? FALLBACK.mobile : FALLBACK.desktop)[kind]
 }
 
 function Pack({ url, texture, index }) {
@@ -100,20 +105,32 @@ function Pack({ url, texture, index }) {
     const g = group.current
     if (!g) return
     const d = Math.min(dt, 0.05)
-    const L = journey.isMobile ? LAYOUT.mobile : LAYOUT.desktop
     const m = journey.mode
     const isActive = journey.active === index
 
-    const heroSlot = L.hero[index]
-    const [hx, hy] = project(heroSlot.f[0], heroSlot.f[1])
-    const [cx, cy] = project(L.chapter.f[0], L.chapter.f[1])
+    // ---- hero: three packs abreast inside the reserved slot ----
+    const hs = slotFor('hero')
+    const heroH = fitHeight(hs.h * 0.94, hs.w, 0.40)
+    const spread = Math.min(hs.w * 0.30, heroH * 0.62)
+    const lift = index === 0 ? 0 : heroH * 0.06
+    // sit the row toward the foot of its slot so tall phones don't leave a gap
+    const settle = Math.max((hs.h - heroH) / 2, 0) * 0.5
+    const heroCx = hs.cx + (index === 0 ? 0 : index === 1 ? -spread : spread)
+    const heroCy = hs.cy + settle + lift
+    const heroScale = (index === 0 ? heroH : heroH * 0.74) * VISIBLE
+    const heroRot = index === 0 ? 0 : index === 1 ? 0.16 : -0.16
 
-    // hero row -> single standing pack
-    const tx = THREE.MathUtils.lerp(hx, cx, isActive ? m : m)
-    const ty = THREE.MathUtils.lerp(hy, cy, isActive ? m : m)
-    const heroScale = heroSlot.s
-    const chapScale = isActive ? L.chapter.s : 0.0001
-    const ts = THREE.MathUtils.lerp(heroScale, chapScale, m) * (1 - journey.exit * 0.35)
+    // ---- chapter: one pack standing in the scene slot ----
+    const cs = slotFor('chapter')
+    const chapH = fitHeight(cs.h * 0.94, cs.w, 0.52)
+    const chapScaleOn = chapH * VISIBLE
+
+    const [hx, hy] = project(heroCx, heroCy)
+    const [cx, cy] = project(cs.cx, cs.cy)
+
+    const tx = THREE.MathUtils.lerp(hx, cx, m)
+    const ty = THREE.MathUtils.lerp(hy, cy, m)
+    const ts = THREE.MathUtils.lerp(heroScale, isActive ? chapScaleOn : 0.0001, m) * (1 - journey.exit * 0.35)
     const to = THREE.MathUtils.lerp(1, isActive ? 1 : 0, m) * (1 - journey.exit)
 
     // exponential damping -> frame-rate independent, no jitter
@@ -127,10 +144,10 @@ function Pack({ url, texture, index }) {
     // idle turn + pointer parallax
     const spin = journey.reduced ? 0 : performance.now() * 0.00012
     const parallax = journey.reduced ? 0 : journey.pointer.x * 0.18
-    const baseRot = THREE.MathUtils.lerp(heroSlot.r, 0, m)
+    const baseRot = THREE.MathUtils.lerp(heroRot, 0, m)
     st.ry += (baseRot + parallax + Math.sin(spin) * 0.28 - st.ry) * Math.min(k, 0.08)
 
-    const float = journey.reduced ? 0 : Math.sin(performance.now() * 0.0009 + index) * 0.025
+    const float = journey.reduced ? 0 : Math.sin(performance.now() * 0.0009 + index) * 0.02
 
     // past the chapter stack the pack is retired outright — no lingering ghost
     if (journey.exit > 0.995) { st.o = 0; st.s = 0.0001 }

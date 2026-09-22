@@ -47,14 +47,14 @@ p{margin:0}
 
 .display{
   font-family:var(--f-display);font-weight:300;text-transform:uppercase;
-  font-size:clamp(2.1rem,6.1vw,6.4rem);line-height:.95;letter-spacing:-.025em;
+  font-size:clamp(1.7rem,6.1vw,6.4rem);line-height:.98;letter-spacing:-.025em;
   color:var(--fg);
 }
-.display--md{font-size:clamp(1.8rem,4.2vw,3.8rem);line-height:1}
+.display--md{font-size:clamp(1.55rem,4.2vw,3.8rem);line-height:1.02}
 .display__em{color:var(--fg-accent);font-style:italic}
 
-.kicker{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;font-weight:500}
-.lede{color:var(--fg-muted);font-size:clamp(.98rem,1.25vw,1.12rem);line-height:1.7;max-width:34em}
+.kicker{font-family:var(--f-mono);font-size:clamp(.58rem,2.1vw,.68rem);letter-spacing:.14em;color:var(--gold);text-transform:uppercase;font-weight:500}
+.lede{color:var(--fg-muted);font-size:clamp(.9rem,3.4vw,1.12rem);line-height:1.62;max-width:34em}
 
 /* ========================================================== progress bar */
 .progress{position:fixed;inset:0 0 auto;height:2px;z-index:80;background:rgba(207,195,242,.12)}
@@ -104,6 +104,7 @@ p{margin:0}
 .btn--ghost{background:transparent;color:var(--fg);border-color:color-mix(in srgb,var(--fg) 40%,transparent)}
 .btn--ghost:hover{background:color-mix(in srgb,var(--fg) 12%,transparent)}
 .btn--sm{padding:.66rem 1.05rem;font-size:.82rem}
+.btn{white-space:nowrap}
 .btn--wide{width:100%}
 .row{display:flex;flex-wrap:wrap;gap:.85rem;align-items:center;margin-top:1.5rem}
 .chip{display:inline-flex;align-items:center;padding:.64rem 1.05rem;border-radius:999px;border:1px solid color-mix(in srgb,var(--fg) 40%,transparent);font-size:.88rem;font-weight:500;color:var(--fg);background:transparent}
@@ -162,6 +163,7 @@ p{margin:0}
 .chapters__veil{position:absolute;inset:0;z-index:1;
   background:linear-gradient(100deg,rgba(21,3,52,.97) 0%,rgba(21,3,52,.86) 34%,rgba(21,3,52,.30) 68%,rgba(21,3,52,.12) 100%)}
 .chapters__wrap{position:relative;z-index:3;width:100%}
+.chapters__slot{position:absolute;z-index:2;pointer-events:none;left:46%;top:14%;width:28%;height:50%}
 .panel{max-width:34rem;display:grid;gap:.95rem}
 .panel__eyebrow{display:flex;align-items:center;gap:.7rem;font-family:var(--f-mono);font-size:.66rem;letter-spacing:.16em;color:var(--muted)}
 .panel__rule{width:32px;height:1px;background:rgba(207,195,242,.5)}
@@ -181,6 +183,7 @@ p{margin:0}
   .chapters__veil{inset:0 0 auto;height:54svh;
     background:linear-gradient(to bottom,rgba(21,3,52,.12) 0%,rgba(21,3,52,.28) 46%,rgba(21,3,52,.9) 78%,var(--deep) 100%)}
   .chapters__wrap{position:absolute;left:0;right:0;bottom:4rem}
+  .chapters__slot{left:30%;top:5%;width:44%;height:31%}
   .panel{gap:.7rem}
   .specs__row{padding:.62rem 0}
   .panel .row{margin-top:1rem}
@@ -358,3 +361,57 @@ p{margin:0}
 .shirt__tag span{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;transition:opacity .3s linear}
 .shirt__tag--a{color:#E7A0A0;opacity:clamp(0,calc((.58 - var(--panelp,0)) * 5),1)}
 .shirt__tag--b{color:var(--gold-3);opacity:clamp(0,calc((var(--panelp,0) - .52) * 5),1)}
+
+/* ============================================ small phones (<=400px wide)
+   The 3D packs follow .hero__slot / .chapters__slot, so the only job here is
+   keeping the type and chrome from crowding the reserved space. */
+@media (max-width:400px){
+  :root{--pad:18px}
+  .nav{padding:.7rem var(--pad)}
+  .nav__brand{font-size:1.12rem}
+  .nav__menu.btn{padding:.55rem .9rem;font-size:.78rem}
+  .hero{padding-block:4.75rem 1rem}
+  .hero__wrap{gap:.8rem}
+  .hero__foot{margin-top:1rem}
+  .row{gap:.6rem;margin-top:1rem}
+  .btn{padding:.82rem 1.3rem;font-size:.86rem}
+  .dock{padding:.72rem 1.2rem;font-size:.8rem;bottom:.8rem}
+  .hero__hint{display:none}
+  .card__shelf{min-height:150px;padding:1rem .8rem .2rem}
+  .card__shelf img{max-height:136px}
+  .card__foot{padding:0 1.05rem 1.05rem;gap:.6rem}
+  .card__foot h3{font-size:1.25rem}
+  .card__foot p{font-size:.76rem}
+  .panel__name{font-size:clamp(1.8rem,8.4vw,2.4rem)}
+  .specs dd{font-size:.86rem}
+  .form{padding:1.15rem}
+  .field input{padding:.8rem .9rem;font-size:.95rem}
+}
+
+/* chapter label must clear the fixed nav on every phone */
+@media (max-width:979px){
+  .chapterbar{top:4.9rem}
+  .panel3d__inner{padding-block:7.25rem 3.5rem}
+  .chapters__sticky .chapterbar{top:4.9rem}
+}
+
+/* ================================================== short phones (<=700px tall)
+   The pinned product chapter has to fit a scene, an info panel and a CTA row in
+   one screen; on short viewports the copy would otherwise ride up into the pack. */
+@media (max-width:979px) and (max-height:700px){
+  .chapters__bg,.chapters__veil{height:42svh}
+  .chapters__slot{top:2%;height:22%}
+  .chapters__wrap{bottom:3.1rem}
+  .panel__name{font-size:clamp(1.65rem,7.6vw,2.1rem)}
+  .panel__desc{font-size:.82rem;line-height:1.48}
+  .specs__row{padding:.44rem 0}
+  .specs dt{font-size:.6rem}
+  .specs dd{font-size:.8rem}
+  .panel .row{margin-top:.7rem}
+  .panel .btn{padding:.7rem 1.1rem;font-size:.8rem}
+  .dots{bottom:1.1rem}
+  .counter{bottom:1.1rem}
+  .chapterbar{top:4.4rem}
+  /* the floating CTA would sit on top of the section buttons here */
+  .dock{display:none}
+}
