@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { PRODUCTS, DRACO_PATH } from '../data'
 import { journey, clamp } from '../journey'
@@ -17,55 +17,81 @@ function useProjector() {
   }, [camera, size.width, size.height])
 }
 
-// Normalise each GLB: centre it and scale so its height is 1 world unit.
-function useNormalisedModel(url) {
+// Normalise each GLB: centre it, scale height to 1 world unit, and re-project
+// the ORIGINAL pack artwork onto it with a planar (front-facing) UV map.
+// The AI-baked texture garbles the packaging copy; the original photo does not.
+function useNormalisedModel(url, textureUrl) {
   const { scene } = useGLTF(url, DRACO_PATH)
+  const art = useTexture(textureUrl)
+
   return useMemo(() => {
+    art.colorSpace = THREE.SRGBColorSpace
+    art.flipY = true
+    art.anisotropy = 8
+    art.needsUpdate = true
+
     const root = scene.clone(true)
-    const boxBounds = new THREE.Box3().setFromObject(root)
-    const size = boxBounds.getSize(new THREE.Vector3())
-    const centre = boxBounds.getCenter(new THREE.Vector3())
+    const bounds = new THREE.Box3().setFromObject(root)
+    const size = bounds.getSize(new THREE.Vector3())
+    const centre = bounds.getCenter(new THREE.Vector3())
     const s = 1 / Math.max(size.y, 0.0001)
     root.position.set(-centre.x * s, -centre.y * s, -centre.z * s)
     root.scale.setScalar(s)
+
+    root.traverse((o) => {
+      if (!o.isMesh) return
+      const g = o.geometry
+      g.computeBoundingBox()
+      const bb = g.boundingBox
+      const w = Math.max(bb.max.x - bb.min.x, 1e-6)
+      const h = Math.max(bb.max.y - bb.min.y, 1e-6)
+      const pos = g.attributes.position
+      const uv = new Float32Array(pos.count * 2)
+      for (let i = 0; i < pos.count; i++) {
+        uv[i * 2] = (pos.getX(i) - bb.min.x) / w
+        uv[i * 2 + 1] = (pos.getY(i) - bb.min.y) / h
+      }
+      g.setAttribute('uv', new THREE.BufferAttribute(uv, 2))
+
+      const m = new THREE.MeshStandardMaterial({
+        map: art,
+        transparent: true,
+        roughness: 0.46,
+        metalness: 0.08,
+        envMapIntensity: 1.1
+      })
+      o.material = m
+      o.castShadow = false
+      o.receiveShadow = false
+    })
+
     const holder = new THREE.Group()
     holder.add(root)
-    holder.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = false
-        o.receiveShadow = false
-        o.material = o.material.clone()
-        o.material.transparent = true
-        o.material.depthWrite = true
-        o.material.roughness = Math.min(o.material.roughness ?? 0.7, 0.62)
-        o.material.envMapIntensity = 1.1
-      }
-    })
     return holder
-  }, [scene])
+  }, [scene, art])
 }
 
 const LAYOUT = {
   desktop: {
     hero: [
-      { f: [0.705, 0.505], s: 2.10, r: 0 },
-      { f: [0.560, 0.560], s: 1.55, r: 0.16 },
-      { f: [0.855, 0.560], s: 1.55, r: -0.16 }
+      { f: [0.500, 0.755], s: 1.88, r: 0 },
+      { f: [0.335, 0.780], s: 1.40, r: 0.16 },
+      { f: [0.665, 0.780], s: 1.40, r: -0.16 }
     ],
     chapter: { f: [0.605, 0.445], s: 2.45 }
   },
   mobile: {
     hero: [
-      { f: [0.500, 0.780], s: 1.35, r: 0 },
-      { f: [0.245, 0.805], s: 1.00, r: 0.16 },
-      { f: [0.755, 0.805], s: 1.00, r: -0.16 }
+      { f: [0.500, 0.775], s: 1.18, r: 0 },
+      { f: [0.255, 0.796], s: 0.89, r: 0.16 },
+      { f: [0.745, 0.796], s: 0.89, r: -0.16 }
     ],
     chapter: { f: [0.545, 0.187], s: 0.95 }
   }
 }
 
-function Pack({ url, index }) {
-  const model = useNormalisedModel(url)
+function Pack({ url, texture, index }) {
+  const model = useNormalisedModel(url, texture)
   const group = useRef()
   const project = useProjector()
   const state = useRef({ x: 0, y: 0, s: 0.001, o: 0, ry: 0 })
@@ -155,7 +181,7 @@ export default function Scene3D() {
       >
         <Lights />
         <Suspense fallback={null}>
-          {PRODUCTS.map((p, i) => <Pack key={p.key} url={p.model} index={i} />)}
+          {PRODUCTS.map((p, i) => <Pack key={p.key} url={p.model} texture={p.image} index={i} />)}
         </Suspense>
       </Canvas>
     </div>

@@ -15,6 +15,7 @@ export const journey = {
   chapP: 0,   // 0..PRODUCT_COUNT through the chapter stack
   mode: 0,    // 0 = hero layout, 1 = chapter layout
   exit: 0,    // 1 once the chapter stack is behind us
+  docP: 0,    // whole-page progress, for the top bar
   active: 0,
   pointer: { x: 0, y: 0 }
 }
@@ -22,6 +23,7 @@ export const journey = {
 if (typeof window !== 'undefined') window.__journey = journey
 
 let els = { hero: null, chapters: null }
+let panels = []
 let box = { heroTop: 0, heroH: 0, chapTop: 0, chapH: 0 }
 let listeners = new Set()
 let raf = 0
@@ -32,6 +34,10 @@ export function registerSections(hero, chapters) {
   els.hero = hero
   els.chapters = chapters
   measure()
+}
+
+export function registerPanels(list) {
+  panels = list.filter(Boolean)
 }
 
 export function onActiveChange(fn) {
@@ -57,10 +63,16 @@ function measure() {
 }
 
 let lastActive = -1
+let lastDocP = -1
 
 function tick() {
   const y = window.scrollY || document.documentElement.scrollTop || 0
   journey.scrollY = y
+  journey.docP = clamp(y / Math.max(document.documentElement.scrollHeight - journey.vh, 1))
+  if (Math.abs(journey.docP - lastDocP) > 0.0015) {
+    lastDocP = journey.docP
+    document.documentElement.style.setProperty('--docp', journey.docP.toFixed(4))
+  }
 
   const heroSpan = Math.max(box.heroH, 1)
   journey.heroP = clamp((y - box.heroTop) / heroSpan)
@@ -78,6 +90,14 @@ function tick() {
   // float over the sections below
   const chapEnd = box.chapTop + box.chapH - journey.vh
   journey.exit = clamp((y - chapEnd) / Math.max(journey.vh * 0.4, 1))
+
+  // grail-style stacking: each sticky panel recedes as the next one covers it
+  for (let i = 0; i < panels.length; i++) {
+    const next = panels[i + 1]
+    if (!next) { panels[i].style.setProperty('--recede', '0'); continue }
+    const top = next.getBoundingClientRect().top
+    panels[i].style.setProperty('--recede', clamp(1 - top / Math.max(journey.vh, 1)).toFixed(3))
+  }
 
   const idx = Math.min(chapterCount - 1, Math.max(0, Math.floor(journey.chapP - 0.001 + 0.35)))
   journey.active = idx
