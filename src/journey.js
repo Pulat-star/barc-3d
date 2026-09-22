@@ -19,6 +19,8 @@ export const journey = {
   pointer: { x: 0, y: 0 }
 }
 
+if (typeof window !== 'undefined') window.__journey = journey
+
 let els = { hero: null, chapters: null }
 let box = { heroTop: 0, heroH: 0, chapTop: 0, chapH: 0 }
 let listeners = new Set()

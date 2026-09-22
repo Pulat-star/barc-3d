@@ -106,11 +106,14 @@ function Pack({ url, index }) {
 
     const float = journey.reduced ? 0 : Math.sin(performance.now() * 0.0009 + index) * 0.025
 
+    // past the chapter stack the pack is retired outright — no lingering ghost
+    if (journey.exit > 0.995) { st.o = 0; st.s = 0.0001 }
+
     g.position.set(st.x, st.y + float, 0)
     g.scale.setScalar(Math.max(st.s, 0.0001))
     g.rotation.y = st.ry
     g.rotation.z = Math.sin(st.ry) * 0.02
-    g.visible = st.o > 0.01
+    g.visible = st.o > 0.01 && journey.exit < 0.999
 
     g.traverse((o) => { if (o.isMesh) o.material.opacity = clamp(st.o) })
   })
