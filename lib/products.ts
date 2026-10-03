@@ -28,9 +28,6 @@ export const PRODUCTS: Product[] = [
 ]
 
 export const SCENES = {
-  room: asset('scenes/room.jpg'),
-  machine: asset('scenes/machine.jpg'),
-  towels: asset('scenes/towels.jpg'),
   shirtDirty: asset('scenes/shirt-dirty.webp'),
   shirtClean: asset('scenes/shirt-clean.webp')
 }
