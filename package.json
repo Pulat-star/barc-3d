@@ -1,24 +1,29 @@
 {
-  "name": "barc-3d",
+  "name": "barc-showcase",
   "private": true,
-  "version": "1.0.0",
-  "type": "module",
+  "version": "2.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview --port 4173"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "serve": "npx --yes serve out -l 4173"
   },
   "dependencies": {
-    "@react-three/drei": "^9.114.0",
-    "@react-three/fiber": "^8.17.10",
+    "framer-motion": "^11.11.17",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.18",
+    "next": "14.2.18",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "three": "^0.169.0"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@gltf-transform/cli": "^4.5.0",
-    "@vitejs/plugin-react": "^4.3.3",
-    "sharp": "^0.35.4",
-    "vite": "^5.4.10"
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^3.4.15",
+    "typescript": "^5.6.3"
   }
 }

@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/Users/khimmatovpolat/Projects/barc-website/app/layout":["static/media/0e96d314a90a6138-s.p.woff2","static/media/b7ea2ab4a8ad1f81-s.p.woff2","static/media/af4bf8399d1aacdf-s.p.woff2","static/media/6ba5f591ae6c56f6-s.p.woff2","static/media/4c9affa5bc8f420e-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';

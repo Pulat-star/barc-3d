@@ -1,41 +1,47 @@
-# BÄRC — 3 in 1 kir yuvish kapsulalari
+# Bärc — laundry care system
 
-Deep-purple, 3D scroll-driven marketing site for BÄRC laundry pods.
+Showcase site for international trade shows. Built around the brand as a
+**system of formats**, not a single hero product.
 
 **Live:** https://pulat-star.github.io/barc-3d/
 
-## Nima bor
+## Why it is built this way
 
-- **Real 3D mahsulotlar** — har bir qadoq `image_to_3d` orqali GLB model (Draco bilan 5.5 MB → ~440 KB).
-- **Scroll bilan bog‘langan sahna** — realistik xonada kir mashinasi ustida turgan qadoq; scroll qilganda mahsulot va uning ma’lumotlari almashadi.
-- **Siliq kamera** — damped lerp (`1 - 0.0015^dt`), kadr chastotasidan mustaqil, sakrashsiz.
-- **iOS-xavfsiz scroll** — `dvh` ishlatilmaydi (`svh`), `visualViewport` resize’da qayta o‘lchanadi, video scrub yo‘q.
-- **Responsiv** — mobil (390), planshet (834), desktop (1440).
+- **Multi-product by construction.** Every section — hero cluster, pinned chain,
+  catalogue — reads from `lib/products.ts`. Adding a new Bärc line means adding
+  one entry to that array; nothing else changes.
+- **One master timeline.** `lib/masterTimeline.ts` drives all six products from a
+  single pinned `ScrollTrigger`. Each product's exit overlaps its successor's
+  entrance, and that overlap window is the morph — so the sequence reads as one
+  continuous motion instead of six separate ones.
+- **One background surface.** `components/ui/BackgroundLayer.tsx` is a single
+  fixed layer whose colour is interpolated from scroll progress. Sections never
+  paint their own background, so there is no hard edge anywhere.
+- **Real packaging, pink as the brand accent.** The three shipping capsules use
+  their actual photography; pink carries the brand through CTAs, labels and the
+  formats still in development, which are marked *In development*.
 
-## Ishga tushirish
+## Copy pattern
+
+Every product and pillar follows the same three beats: a small category label,
+a promise in plain words, then one concrete sentence about what it does.
+
+## Stack
+
+Next.js 14 (App Router, static export) · TypeScript · Tailwind · GSAP
+ScrollTrigger · Lenis.
+
+## Run
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/barc-3d/
-npm run build
-npm run preview
+npm run dev          # http://localhost:3000/barc-3d
+npm run build        # static export to ./out
+npm run serve        # preview the export
 ```
 
-`BASE_PATH=/ npm run build` — boshqa domenda root’ga joylashtirish uchun.
+`BASE_PATH= npm run build` builds for a domain root instead of the Pages subpath.
 
-## Nashr
+## Deploy
 
-`dist` `gh-pages` branch’iga yuklanadi:
-
-```bash
-npm run build
-npx gh-pages -d dist      # yoki qo'lda: git subtree / worktree
-```
-
-> GitHub Actions workflow qo'shilmadi — joriy token’da `workflow` scope yo'q.
-> Kerak bo'lsa `gh auth refresh -s workflow` qilib, `.github/workflows/deploy.yml` qo'shsa bo'ladi.
-
-## Dizayn
-
-Figma: `v5 — BÄRC 3D` sahifasi — desktop, planshet va mobil kadrlar.
-Shriftlar: Fraunces (sarlavha), Manrope (matn), DM Mono (yorliq), Unbounded (logo).
+`out/` is pushed to the `gh-pages` branch.
