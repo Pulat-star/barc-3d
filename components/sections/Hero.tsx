@@ -4,6 +4,7 @@ import { PRODUCTS } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
+import { Lines } from '@/components/ui/Type'
 
 /**
  * Every format is on screen in the first second, so the brand reads as a system
@@ -35,9 +36,9 @@ export default function Hero() {
       <div className="wrap">
         <p className="kicker" data-rv>{pick(COPY.hero.kicker, lang)}</p>
         <h1 className="display mt-3 text-[clamp(2.2rem,7.2vw,6.2rem)]">
-          <span className="block" data-rv style={{ ['--d' as string]: '80ms' }}>{pick(COPY.hero.line1, lang)}</span>
-          <span className="block italic" data-rv style={{ ['--d' as string]: '200ms', color: 'var(--accent)' }}>
-            {pick(COPY.hero.line2, lang)}
+          <Lines lines={[pick(COPY.hero.line1, lang)]} start={80} />
+          <span className="italic" style={{ color: 'var(--accent)' }}>
+            <Lines lines={[pick(COPY.hero.line2, lang)]} start={200} />
           </span>
         </h1>
 
@@ -57,7 +58,7 @@ export default function Hero() {
           {ordered.map((p, i) => (
             <figure key={p.slug} className="flex min-h-0 flex-col items-center justify-end" data-rv style={{ ['--d' as string]: `${260 + i * 70}ms` }}>
               <img src={p.image} alt={p.name} className="min-h-0 w-auto flex-1 object-contain" loading={i < 3 ? 'eager' : 'lazy'} />
-              <figcaption className="mt-1.5 shrink-0 font-mono text-[0.48rem] tracking-[0.12em] uppercase" style={{ color: 'var(--fg-mute)' }}>
+              <figcaption className="mt-1.5 shrink-0 font-mono text-[0.75rem] tracking-[0.12em] uppercase" style={{ color: 'var(--fg-mute)' }}>
                 {pick(COPY.chain.categories[p.category], lang)}
               </figcaption>
             </figure>
@@ -89,7 +90,7 @@ export default function Hero() {
                   loading={i < 4 ? 'eager' : 'lazy'}
                 />
                 <figcaption
-                  className="mt-2.5 shrink-0 whitespace-nowrap font-mono text-[0.46rem] tracking-[0.14em] uppercase lg:text-[0.55rem] lg:tracking-[0.18em]"
+                  className="mt-2.5 shrink-0 whitespace-nowrap font-mono text-[0.75rem] tracking-[0.14em] uppercase lg:text-[0.75rem] lg:tracking-[0.18em]"
                   style={{ color: 'var(--fg-mute)' }}
                 >
                   {pick(COPY.chain.categories[p.category], lang)}
@@ -100,7 +101,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="wrap flex shrink-0 items-center justify-between pb-5 pt-3 font-mono text-[0.58rem] tracking-[0.18em] uppercase" style={{ color: 'var(--fg-mute)' }}>
+      <div className="wrap flex shrink-0 items-center justify-between pb-5 pt-3 font-mono text-[0.75rem] tracking-[0.18em] uppercase" style={{ color: 'var(--fg-mute)' }}>
         <span data-rv style={{ ['--d' as string]: '620ms' }}>{pick(COPY.hero.meta, lang)}</span>
         <span data-rv style={{ ['--d' as string]: '680ms' }}>{PRODUCTS.length} formats</span>
       </div>

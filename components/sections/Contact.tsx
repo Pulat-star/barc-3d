@@ -3,11 +3,15 @@ import { useEffect, useState } from 'react'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
+import { Lines } from '@/components/ui/Type'
+
+type Mode = 'retail' | 'trade'
 
 export default function Contact() {
   const { lang } = useLang()
   const [sent, setSent] = useState(false)
-  useEffect(() => { observeReveals() }, [lang, sent])
+  const [mode, setMode] = useState<Mode>('retail')
+  useEffect(() => { observeReveals() }, [lang, sent, mode])
 
   const field = 'w-full rounded-2xl px-4 py-3.5 text-[0.98rem] outline-none transition-shadow'
   const fieldStyle = {
@@ -21,12 +25,28 @@ export default function Contact() {
       <div className="wrap grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)] lg:gap-20">
         <div>
           <p className="kicker" data-rv>{pick(COPY.contact.kicker, lang)}</p>
-          <h2 className="display mt-3 text-[clamp(1.9rem,4.6vw,3.6rem)]" data-rv style={{ ['--d' as string]: '80ms' }}>
-            {pick(COPY.contact.title, lang)}
+          <h2 className="display mt-3 text-[clamp(1.9rem,4.6vw,3.6rem)]">
+            <Lines lines={[pick(COPY.contact.title, lang)]} start={80} />
           </h2>
           <p className="lede mt-5" data-rv style={{ ['--d' as string]: '170ms' }}>
-            {pick(COPY.contact.lede, lang)}
+            {mode === 'retail' ? pick(COPY.contact.retailLede, lang) : pick(COPY.contact.lede, lang)}
           </p>
+
+          {/* the page serves a shopper and a buying team — let them say which */}
+          <div className="mt-7 inline-flex rounded-full p-1" data-rv style={{ ['--d' as string]: '240ms', border: '1px solid color-mix(in srgb, var(--fg) 22%, transparent)' }}>
+            {([['retail', COPY.contact.tabRetail], ['trade', COPY.contact.tabTrade]] as const).map(([k, label]) => (
+              <button
+                key={k}
+                onClick={() => setMode(k as Mode)}
+                className="rounded-full px-4 py-2 text-[0.85rem] font-semibold transition-colors duration-300"
+                style={mode === k
+                  ? { background: 'var(--accent)', color: '#2A0846' }
+                  : { color: 'var(--fg-mute)' }}
+              >
+                {pick(label, lang)}
+              </button>
+            ))}
+          </div>
         </div>
 
         {sent ? (
@@ -52,8 +72,16 @@ export default function Contact() {
               <input required minLength={2} name="name" className={field} style={fieldStyle} placeholder={pick(COPY.contact.namePh, lang)} />
             </label>
             <label className="grid gap-2">
-              <span className="text-[0.78rem] font-semibold" style={{ color: 'var(--fg-mute)' }}>{pick(COPY.contact.company, lang)}</span>
-              <input required name="company" className={field} style={fieldStyle} placeholder={pick(COPY.contact.companyPh, lang)} />
+              <span className="text-[0.78rem] font-semibold" style={{ color: 'var(--fg-mute)' }}>
+                {mode === 'retail' ? pick(COPY.contact.city, lang) : pick(COPY.contact.company, lang)}
+              </span>
+              <input
+                required
+                name={mode === 'retail' ? 'city' : 'company'}
+                className={field}
+                style={fieldStyle}
+                placeholder={mode === 'retail' ? pick(COPY.contact.cityPh, lang) : pick(COPY.contact.companyPh, lang)}
+              />
             </label>
             <label className="grid gap-2">
               <span className="text-[0.78rem] font-semibold" style={{ color: 'var(--fg-mute)' }}>{pick(COPY.contact.email, lang)}</span>

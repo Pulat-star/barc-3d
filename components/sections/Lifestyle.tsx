@@ -4,6 +4,7 @@ import { SCENES } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
+import { Lines } from '@/components/ui/Type'
 import { gsap, ScrollTrigger, registerGsap } from '@/lib/masterTimeline'
 
 /** Scroll scrubs a soft wipe: the stained shirt becomes the clean one. */
@@ -35,8 +36,8 @@ export default function Lifestyle() {
       <div className="wrap grid items-center gap-10 md:grid-cols-2 md:gap-16">
         <div>
           <p className="kicker" data-rv>{pick(COPY.lifestyle.kicker, lang)}</p>
-          <h2 className="display mt-3 text-[clamp(1.9rem,4.6vw,3.6rem)]" data-rv style={{ ['--d' as string]: '80ms' }}>
-            {pick(COPY.lifestyle.title, lang)}
+          <h2 className="display mt-3 text-[clamp(1.9rem,4.6vw,3.6rem)]">
+            <Lines lines={[pick(COPY.lifestyle.title, lang)]} start={80} />
           </h2>
           <p className="lede mt-5" data-rv style={{ ['--d' as string]: '170ms' }}>
             {pick(COPY.lifestyle.lede, lang)}
@@ -49,7 +50,7 @@ export default function Lifestyle() {
             <img src={SCENES.shirtClean} alt="" className="shirt__img shirt__img--clean" />
             <span aria-hidden className="shirt__sweep" />
           </div>
-          <p className="relative mt-4 h-5 text-center font-mono text-[0.62rem] tracking-[0.2em] uppercase">
+          <p className="relative mt-4 h-5 text-center font-mono text-[0.75rem] tracking-[0.2em] uppercase">
             <span className="shirt__tag shirt__tag--a">{pick(COPY.lifestyle.before, lang)}</span>
             <span className="shirt__tag shirt__tag--b">{pick(COPY.lifestyle.after, lang)}</span>
           </p>

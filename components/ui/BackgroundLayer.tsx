@@ -9,11 +9,11 @@ import { useEffect, useRef } from 'react'
 type Stop = { at: number; bg: string; bg2: string; fg: string; mute: string }
 
 const STOPS: Stop[] = [
-  { at: 0.00, bg: '#F7F6F4', bg2: '#EFEDE8', fg: '#141317', mute: '#6E6A75' },
-  { at: 0.30, bg: '#F1EEE9', bg2: '#E6E2DB', fg: '#161419', mute: '#6B6772' },
-  { at: 0.55, bg: '#E7E3DD', bg2: '#D9D4CC', fg: '#161419', mute: '#625E69' },
-  { at: 0.78, bg: '#2B2830', bg2: '#201E25', fg: '#F6F4F1', mute: '#A49FAD' },
-  { at: 1.00, bg: '#141317', bg2: '#0E0D11', fg: '#F6F4F1', mute: '#9E99A8' }
+  { at: 0.00, bg: '#2E0A4F', bg2: '#4A1578', fg: '#FFFFFF', mute: '#C7B0E8' },
+  { at: 0.28, bg: '#360C5C', bg2: '#56198A', fg: '#FFFFFF', mute: '#CDB7EC' },
+  { at: 0.55, bg: '#3E1069', bg2: '#61209B', fg: '#FFFFFF', mute: '#D2BEEF' },
+  { at: 0.80, bg: '#28083F', bg2: '#3C1063', fg: '#FFFFFF', mute: '#BCA3E2' },
+  { at: 1.00, bg: '#1C0733', bg2: '#2B0A4A', fg: '#FFFFFF', mute: '#B296DD' }
 ]
 
 const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
@@ -69,11 +69,11 @@ export default function BackgroundLayer() {
       <div
         ref={glow}
         className="absolute left-1/4 top-0 h-[85vmax] w-[85vmax] rounded-full will-change-transform"
-        style={{ background: 'radial-gradient(circle, rgba(232,53,138,.30), transparent 62%)', filter: 'blur(14px)' }}
+        style={{ background: 'radial-gradient(circle, rgba(249,184,31,.16), rgba(155,78,230,.26) 42%, transparent 66%)', filter: 'blur(14px)' }}
       />
       {/* paper grain — keeps the flat neutral ground from looking like dead CSS */}
       <div
-        className="absolute inset-0 opacity-[0.045] mix-blend-multiply"
+        className="absolute inset-0 opacity-[0.07] mix-blend-overlay"
         style={{
           backgroundImage:
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E\")",

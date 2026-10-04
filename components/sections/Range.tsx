@@ -4,6 +4,7 @@ import { PRODUCTS } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
+import { Lines } from '@/components/ui/Type'
 
 /** The catalogue. A new Bärc line appears here by adding one entry to PRODUCTS. */
 export default function Range() {
@@ -11,11 +12,11 @@ export default function Range() {
   useEffect(() => { observeReveals() }, [lang])
 
   return (
-    <section id="range" className="relative py-24 md:py-36">
-      <div className="wrap">
+    <section id="range" data-nav="light" className="relative py-16 md:py-24">
+      <div className="light-panel wrap">
         <p className="kicker" data-rv>{pick(COPY.chain.kicker, lang)}</p>
-        <h2 className="display mt-3 text-[clamp(1.9rem,5vw,4rem)]" data-rv style={{ ['--d' as string]: '80ms' }}>
-          {pick(COPY.chain.title, lang)}
+        <h2 className="display mt-3 text-[clamp(1.9rem,5vw,4rem)]">
+          <Lines lines={[pick(COPY.chain.title, lang)]} start={80} />
         </h2>
         <p className="lede mt-5" data-rv style={{ ['--d' as string]: '150ms' }}>
           {pick(COPY.chain.rangeLede, lang)}
@@ -27,7 +28,7 @@ export default function Range() {
               key={p.slug}
               data-rv
               style={{ ['--d' as string]: `${120 + i * 90}ms`, borderColor: 'color-mix(in srgb, var(--fg) 12%, transparent)' }}
-              className="group relative overflow-hidden rounded-3xl border p-6 transition-transform duration-500 hover:-translate-y-1.5"
+              className="group relative overflow-hidden rounded-3xl border bg-white/70 p-6 transition-transform duration-500 hover:-translate-y-1.5"
             >
               <span
                 aria-hidden
@@ -40,7 +41,7 @@ export default function Range() {
 
               <div className="relative mt-5 flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-mono text-[0.58rem] tracking-[0.18em] uppercase" style={{ color: 'var(--fg-mute)' }}>
+                  <p className="font-mono text-[0.75rem] tracking-[0.18em] uppercase" style={{ color: 'var(--fg-mute)' }}>
                     {pick(COPY.chain.categories[p.category], lang)}
                   </p>
                   <h3 className="display mt-1 text-[1.5rem] italic">{p.name}</h3>
@@ -54,7 +55,7 @@ export default function Range() {
               </div>
 
               <p
-                className="relative mt-4 inline-flex rounded-full px-3 py-1.5 font-mono text-[0.56rem] tracking-[0.16em] uppercase"
+                className="relative mt-4 inline-flex rounded-full px-3 py-1.5 font-mono text-[0.75rem] tracking-[0.16em] uppercase"
                 style={
                   p.available
                     ? { background: p.tint, color: '#fff' }

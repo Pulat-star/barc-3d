@@ -5,6 +5,7 @@ import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { buildChain, createChainState, registerGsap } from '@/lib/masterTimeline'
 import { observeReveals, revealIn } from '@/lib/reveal'
+import { Lines } from '@/components/ui/Type'
 
 const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
 
@@ -45,6 +46,9 @@ export default function ProductChain() {
 
     let raf = 0
     let dpr = 1
+    let live = true
+    const vis = new IntersectionObserver(([e]) => { live = e.isIntersecting }, { rootMargin: '120px 0px' })
+    if (section.current) vis.observe(section.current)
 
     const size = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2)
@@ -56,6 +60,8 @@ export default function ProductChain() {
     window.addEventListener('resize', size)
 
     const frame = () => {
+      raf = requestAnimationFrame(frame)
+      if (!live) return
       const s = stateRef.current
       ctx.clearRect(0, 0, cv.clientWidth, cv.clientHeight)
 
@@ -91,11 +97,10 @@ export default function ProductChain() {
           ctx.globalAlpha = 1
         }
       }
-      raf = requestAnimationFrame(frame)
     }
     raf = requestAnimationFrame(frame)
 
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', size) }
+    return () => { cancelAnimationFrame(raf); vis.disconnect(); window.removeEventListener('resize', size) }
   }, [])
 
   useEffect(() => { revealIn(stage.current); observeReveals() }, [step, lang])
@@ -107,7 +112,7 @@ export default function ProductChain() {
       <div ref={stage} className="relative flex h-[100svh] items-center overflow-hidden">
         <canvas ref={canvas} aria-hidden className="pointer-events-none absolute inset-0 h-full w-full" />
 
-        <p className="wrap pointer-events-none absolute inset-x-0 top-24 z-10 font-mono text-[0.58rem] tracking-[0.2em] uppercase" style={{ color: 'var(--fg-mute)' }}>
+        <p className="wrap pointer-events-none absolute inset-x-0 top-24 z-10 font-mono text-[0.75rem] tracking-[0.2em] uppercase" style={{ color: 'var(--fg-mute)' }}>
           {pick(COPY.chain.label, lang)}
         </p>
 
@@ -115,8 +120,8 @@ export default function ProductChain() {
           {/* info — swaps as the chain advances */}
           <div key={active.slug} className="order-2 md:order-1">
             <p className="kicker" data-rv>{pick(COPY.chain.categories[active.category], lang)}</p>
-            <h2 className="display mt-3 text-[clamp(2rem,5.4vw,4.4rem)]" data-rv style={{ ['--d' as string]: '70ms' }}>
-              {active.name}
+            <h2 className="display mt-3 text-[clamp(2rem,5.4vw,4.4rem)]">
+              <Lines lines={[active.name]} start={70} />
             </h2>
             <p className="mt-4 text-[1.05rem] font-semibold md:text-[1.25rem]" data-rv style={{ ['--d' as string]: '150ms' }}>
               {pick(COPY.chain.promise[active.slug], lang)}
@@ -125,7 +130,7 @@ export default function ProductChain() {
               {pick(COPY.chain.detail[active.slug], lang)}
             </p>
             <p
-              className="mt-5 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-[0.6rem] tracking-[0.16em] uppercase"
+              className="mt-5 inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-[0.75rem] tracking-[0.16em] uppercase"
               data-rv
               style={{
                 ['--d' as string]: '250ms',
@@ -169,7 +174,7 @@ export default function ProductChain() {
               />
             ))}
           </div>
-          <span className="font-mono text-[0.66rem] tracking-[0.14em]" style={{ color: 'var(--fg-mute)' }}>
+          <span className="font-mono text-[0.76rem] tracking-[0.14em]" style={{ color: 'var(--fg-mute)' }}>
             {String(step + 1).padStart(2, '0')} / {String(PRODUCTS.length).padStart(2, '0')}
           </span>
         </div>

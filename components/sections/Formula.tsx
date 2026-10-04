@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
+import { Lines } from '@/components/ui/Type'
 
 export default function Formula() {
   const { lang } = useLang()
@@ -13,8 +14,8 @@ export default function Formula() {
       <div className="wrap grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20">
         <div>
           <p className="kicker" data-rv>{pick(COPY.formula.kicker, lang)}</p>
-          <h2 className="display mt-3 text-[clamp(1.9rem,4.6vw,3.6rem)]" data-rv style={{ ['--d' as string]: '80ms' }}>
-            {pick(COPY.formula.title, lang)}
+          <h2 className="display mt-3 text-[clamp(1.9rem,4.6vw,3.6rem)]">
+            <Lines lines={[pick(COPY.formula.title, lang)]} start={80} />
           </h2>
           <p className="lede mt-5" data-rv style={{ ['--d' as string]: '170ms' }}>
             {pick(COPY.formula.lede, lang)}
