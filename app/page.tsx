@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import Navbar from '@/components/ui/Navbar'
 import Hero from '@/components/sections/Hero'
-import ProductChain from '@/components/sections/ProductChain'
+import ProductOrbit from '@/components/sections/ProductOrbit'
 import Range from '@/components/sections/Range'
 import Formula from '@/components/sections/Formula'
 import Showcase3D from '@/components/sections/Showcase3D'
@@ -33,7 +33,7 @@ export default function Page() {
       <Navbar />
       <main>
         <Hero />
-        <ProductChain />
+        <ProductOrbit />
         <Range />
         <HowTo />
         <Stats />
