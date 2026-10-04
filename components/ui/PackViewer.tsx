@@ -4,6 +4,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { DRACO_PATH } from '@/lib/products'
+import { packScroll } from '@/lib/packScroll'
 
 /**
  * A real 3D pack: the AI-baked texture mangles the packaging copy, so the
@@ -60,14 +61,9 @@ function Pack({ src, texture }: { src: string; texture: string }) {
     const d = Math.min(dt, 0.05)
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    // where this section sits in the viewport drives the turn
-    const host = state.gl.domElement.parentElement
-    let scrollTurn = 0
-    if (host) {
-      const r = host.getBoundingClientRect()
-      const p = 1 - (r.top + r.height / 2) / window.innerHeight
-      scrollTurn = THREE.MathUtils.clamp(p, -1, 1)
-    }
+    // the pinned sequence drives the whole shot: 0 = arriving, 1 = leaving
+    const p = packScroll.p
+    const scrollTurn = p * 2 - 1
     // Never show the back of the pack: a full spin would mirror the artwork and
     // read as a different design. Hard-clamp the turn to ±30°.
     const LIMIT = Math.PI / 6
@@ -79,11 +75,18 @@ function Pack({ src, texture }: { src: string; texture: string }) {
     spin.current.y += (spin.current.target - spin.current.y) * k
 
     g.rotation.y = spin.current.y
-    g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, state.pointer.y * -0.09, k)
-    g.position.y = reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.8) * 0.02
+    g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, state.pointer.y * -0.09 + (0.5 - p) * 0.12, k)
+
+    // rise into frame, hold, then lift away again
+    const arc = Math.sin(Math.min(1, Math.max(0, p)) * Math.PI)
+    const float = reduced ? 0 : Math.sin(state.clock.elapsedTime * 0.8) * 0.02
+    g.position.y = (1 - arc) * -0.55 + float
+    g.position.x = (p - 0.5) * 0.5
+    const zoom = 2.1 + arc * 0.55
+    g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x || zoom, zoom, k))
   })
 
-  return <group ref={group} scale={2.35}><primitive object={model} /></group>
+  return <group ref={group} scale={2.1}><primitive object={model} /></group>
 }
 
 export default function PackViewer({ src, tint, active = true }: { src: string; tint: string; active?: boolean }) {
@@ -94,7 +97,7 @@ export default function PackViewer({ src, tint, active = true }: { src: string; 
       // rendering an off-screen canvas every frame costs the whole page its
       // framerate — park the loop until the section is actually in view
       frameloop={active ? 'always' : 'never'}
-      dpr={[1, 1.75]}
+      dpr={typeof window !== 'undefined' && window.matchMedia('(pointer:coarse)').matches ? [1, 1.4] : [1, 1.75]}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       camera={{ fov: 32, position: [0, 0, 8], near: 0.1, far: 40 }}
       onCreated={({ gl }) => {
