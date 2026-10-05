@@ -4,6 +4,7 @@ import { COPY, pick, LANGS } from '@/lib/copy'
 import { useLang } from './LangContext'
 import Wordmark from './Wordmark'
 import Roll from './Roll'
+import CloseIcon from './CloseIcon'
 
 const LINKS = [
   { href: '#system', k: 'system' as const },
@@ -134,10 +135,7 @@ export default function Navbar() {
             style={{ color: '#fff', border: '1px solid rgba(255,255,255,.4)' }}
           >
             {open ? <Roll text={pick(COPY.stage.close, lang)} /> : pick(COPY.stage.close, lang)}
-            <span className="grid h-7 w-7 place-items-center rounded-full" style={{ background: '#fff' }}>
-              <span style={{ width: 9, height: 1.5, background: '#2A0846', transform: 'rotate(45deg)', position: 'absolute' }} />
-              <span style={{ width: 9, height: 1.5, background: '#2A0846', transform: 'rotate(-45deg)' }} />
-            </span>
+            <CloseIcon />
           </button>
         </div>
 

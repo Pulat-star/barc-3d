@@ -4,6 +4,7 @@ import type { Product } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from './LangContext'
 import Roll from './Roll'
+import CloseIcon from './CloseIcon'
 
 /**
  * Tapping a pack opens its own full view, the way the reference moves from the
@@ -53,10 +54,7 @@ export default function ProductPanel({ product, onClose }: { product: Product | 
               style={{ color: 'var(--fg)', border: '1px solid color-mix(in srgb, var(--fg) 28%, transparent)' }}
             >
               {open ? <Roll text={pick(COPY.stage.close, lang)} /> : pick(COPY.stage.close, lang)}
-              <span className="relative grid h-6 w-6 place-items-center rounded-full" style={{ background: 'var(--accent)' }}>
-                <span className="absolute" style={{ width: 9, height: 1.5, background: '#2A0846', transform: 'rotate(45deg)' }} />
-                <span className="absolute" style={{ width: 9, height: 1.5, background: '#2A0846', transform: 'rotate(-45deg)' }} />
-              </span>
+              <CloseIcon bg="var(--accent)" />
             </button>
           </div>
 
