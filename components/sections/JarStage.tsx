@@ -26,6 +26,10 @@ export default function JarStage() {
   const pin = useRef<HTMLDivElement>(null)
   const ringRef = useRef<SVGGElement>(null)
   const items = useRef<(HTMLDivElement | null)[]>([])
+  // the live model has to ride the same arc as the flat pack it stands in for,
+  // or the two drift apart mid-transition and the product reads twice
+  const ghost = useRef<HTMLDivElement>(null)
+  const ghostPose = useRef({ transform: '', opacity: '1' })
   const [active, setActive] = useState(0)
   const [cursor, setCursor] = useState<{ x: number; y: number; on: boolean }>({ x: 0, y: 0, on: false })
   const [narrow, setNarrow] = useState(false)
@@ -88,7 +92,14 @@ export default function JarStage() {
         tiles[i].style.opacity = String(bell < 0.02 ? 0 : Math.min(1, 0.3 + bell * 1.5))
         tiles[i].style.zIndex = String(10 + Math.round(bell * 20))
 
-        if (Math.abs(x) < bestD) { bestD = Math.abs(x); best = i }
+        if (Math.abs(x) < bestD) {
+          bestD = Math.abs(x); best = i
+          ghostPose.current = { transform: tiles[i].style.transform, opacity: tiles[i].style.opacity }
+        }
+      }
+      if (ghost.current) {
+        ghost.current.style.transform = ghostPose.current.transform
+        ghost.current.style.opacity = ghostPose.current.opacity
       }
       stageScroll.p = p
       if (ringRef.current) ringRef.current.style.transform = `rotate(${(p * 150 - 30).toFixed(2)}deg)`
@@ -121,6 +132,13 @@ export default function JarStage() {
 
   useEffect(() => { setModelReady(false) }, [active])
 
+  // `live` turns on after the last draw, so the fresh wrapper needs the pose now
+  useEffect(() => {
+    if (!ghost.current || !ghostPose.current.transform) return
+    ghost.current.style.transform = ghostPose.current.transform
+    ghost.current.style.opacity = ghostPose.current.opacity
+  })
+
   useEffect(() => {
     const el = section.current
     if (!el) return
@@ -139,11 +157,10 @@ export default function JarStage() {
         className="relative h-[100svh] overflow-hidden"
         onPointerMove={(e) => setCursor((c) => ({ ...c, x: e.clientX, y: e.clientY }))}
       >
-        {/* the plinth and its ring of words */}
+        {/* the plinth: a background shape, so it may bleed past the edges */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 top-[33%] md:top-[40%]">
-          <svg viewBox="0 0 1000 620" preserveAspectRatio={narrow ? "xMidYMid meet" : "xMidYMax slice"} className="h-full w-full">
+          <svg viewBox="0 0 1000 620" preserveAspectRatio={narrow ? 'xMidYMid meet' : 'xMidYMax slice'} className="h-full w-full">
             <defs>
-              <path id="barc-ring" d="M500,338 m-268,0 a268,268 0 1,1 536,0 a268,268 0 1,1 -536,0" />
               <linearGradient id="barc-plinth" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stopColor="#4A1578" />
                 <stop offset="1" stopColor="#2A0846" />
@@ -154,9 +171,29 @@ export default function JarStage() {
               fill="url(#barc-plinth)"
               d="M139 268 C 232 168, 392 150, 512 152 C 648 154, 812 176, 886 272 C 944 346, 938 470, 902 560 C 872 634, 128 634, 100 556 C 64 462, 72 340, 139 268 Z"
             />
-            <g ref={ringRef} style={{ transformOrigin: '500px 338px', transition: 'transform .1s linear' }}>
-              <text fill="var(--accent)" fontSize="27" letterSpacing="5" style={{ fontFamily: 'var(--font-brand)', fontWeight: 800, opacity: 0.8 }}>
-                <textPath href="#barc-ring" startOffset="0%">{ring}</textPath>
+          </svg>
+        </div>
+
+        {/* the ring of brand words turns behind the packs. It gets its own
+            square canvas centred on the pack anchor: inside the plinth's svg it
+            was sliced, and a half-cut word reads as broken type, not as motion. */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-[55%] z-[1] -translate-x-1/2 -translate-y-1/2 md:top-[62%]"
+          style={{ width: 'min(80vw, 52svh)', height: 'min(80vw, 52svh)' }}
+        >
+          <svg viewBox="0 0 620 620" className="h-full w-full">
+            <defs>
+              <path id="barc-ring" d="M310,310 m-268,0 a268,268 0 1,1 536,0 a268,268 0 1,1 -536,0" />
+            </defs>
+            <g ref={ringRef} style={{ transformOrigin: '310px 310px', transition: 'transform .1s linear' }}>
+              {/* textLength pins the words to the exact circumference (2πr),
+                  so the pattern closes on itself instead of being clipped
+                  mid-word where the path ends — and it re-fits per language. */}
+              <text fill="var(--accent)" fontSize="27" style={{ fontFamily: 'var(--font-brand)', fontWeight: 800, opacity: 0.6 }}>
+                <textPath href="#barc-ring" startOffset="0%" textLength={2 * Math.PI * 268} lengthAdjust="spacing">
+                  {ring}
+                </textPath>
               </text>
             </g>
           </svg>
@@ -180,24 +217,38 @@ export default function JarStage() {
                 style={{ maxWidth: 'none', opacity: live && modelReady && active === i ? 0 : 1 }}
                 loading={i < 3 ? 'eager' : 'lazy'}
               />
+              {!p.available && (
+                <span
+                  className="absolute left-1/2 top-full mt-3 -translate-x-1/2 whitespace-nowrap rounded-full px-3 py-[0.3rem] text-[0.62rem] font-semibold uppercase tracking-[0.16em]"
+                  style={{
+                    color: 'var(--fg-mute)',
+                    background: 'color-mix(in srgb, var(--fg) 10%, transparent)',
+                    border: '1px solid color-mix(in srgb, var(--fg) 24%, transparent)'
+                  }}
+                >
+                  {pick(COPY.chain.soon, lang)}
+                </span>
+              )}
             </div>
           ))}
         </div>
 
         {/* the live model sits exactly where the centre pack is */}
         {live && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-1/2 top-[55%] z-[5] -translate-x-1/2 -translate-y-1/2 md:top-[62%]"
-            style={{ width: 'clamp(240px,27vw,420px)', height: 'clamp(300px,34vw,520px)' }}
-          >
-            <StagePack
-              src={PRODUCTS[active].model!}
-              texture={PRODUCTS[active].image}
-              tint={PRODUCTS[active].tint}
-              active
-              onReady={() => setModelReady(true)}
-            />
+          <div aria-hidden className="pointer-events-none absolute left-1/2 top-[55%] z-[5] h-0 w-0 md:top-[62%]">
+            <div
+              ref={ghost}
+              className="absolute left-0 top-0 will-change-transform"
+              style={{ width: 'clamp(240px,27vw,420px)', height: 'clamp(300px,34vw,520px)' }}
+            >
+              <StagePack
+                src={PRODUCTS[active].model!}
+                texture={PRODUCTS[active].image}
+                tint={PRODUCTS[active].tint}
+                active
+                onReady={() => setModelReady(true)}
+              />
+            </div>
           </div>
         )}
 

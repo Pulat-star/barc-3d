@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
@@ -49,6 +49,12 @@ function Model({ src, texture, onReady }: { src: string; texture: string; onRead
     holder.add(root)
     return holder
   }, [scene, art])
+
+  // Every pods line shares one mesh, so swapping product only swaps the
+  // texture — the component never remounts. Without this the "painted" flag
+  // would stay set from the first pack and the flat image behind it would
+  // never hide again, showing the product twice.
+  useEffect(() => { announced.current = false }, [model])
 
   useFrame((state, dt) => {
     const g = group.current
