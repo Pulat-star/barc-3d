@@ -4,6 +4,12 @@ import { PRODUCTS } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { gsap, ScrollTrigger, registerGsap } from '@/lib/masterTimeline'
+import dynamic from 'next/dynamic'
+import ProductPanel from '@/components/ui/ProductPanel'
+import { stageScroll } from '@/lib/stageScroll'
+import type { Product } from '@/lib/products'
+
+const StagePack = dynamic(() => import('@/components/ui/StagePack'), { ssr: false })
 
 /**
  * The landing stage: one full viewport, no page furniture, and scroll drives a
@@ -23,6 +29,19 @@ export default function JarStage() {
   const [active, setActive] = useState(0)
   const [cursor, setCursor] = useState<{ x: number; y: number; on: boolean }>({ x: 0, y: 0, on: false })
   const [narrow, setNarrow] = useState(false)
+  const [detail, setDetail] = useState<Product | null>(null)
+  const [gl, setGl] = useState(false)
+  const [modelReady, setModelReady] = useState(false)
+  // only one WebGL context should be alive at a time: the film further down the
+  // page has its own, and two at once costs a lost context on weaker devices
+  const [inView, setInView] = useState(true)
+
+  useEffect(() => {
+    try {
+      const c = document.createElement('canvas')
+      setGl(!!(c.getContext('webgl2') || c.getContext('webgl')))
+    } catch { setGl(false) }
+  }, [])
 
   useEffect(() => {
     const m = window.matchMedia('(max-width: 859px)')
@@ -71,6 +90,7 @@ export default function JarStage() {
 
         if (Math.abs(x) < bestD) { bestD = Math.abs(x); best = i }
       }
+      stageScroll.p = p
       if (ringRef.current) ringRef.current.style.transform = `rotate(${(p * 150 - 30).toFixed(2)}deg)`
       setActive((prev) => (prev === best ? prev : best))
     }
@@ -99,7 +119,18 @@ export default function JarStage() {
     return () => { window.removeEventListener('resize', onResize); ctx.revert() }
   }, [])
 
+  useEffect(() => { setModelReady(false) }, [active])
+
+  useEffect(() => {
+    const el = section.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: '10% 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
   const ring = pick(COPY.stage.ring, lang).repeat(3)
+  const live = gl && inView && !!PRODUCTS[active].model && !detail
 
   return (
     <section ref={section} id="top" className="relative" style={{ height: `${PRODUCTS.length * 78}svh` }}>
@@ -109,7 +140,7 @@ export default function JarStage() {
         onPointerMove={(e) => setCursor((c) => ({ ...c, x: e.clientX, y: e.clientY }))}
       >
         {/* the plinth and its ring of words */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 top-[26%] md:top-[30%]">
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 top-[33%] md:top-[40%]">
           <svg viewBox="0 0 1000 620" preserveAspectRatio={narrow ? "xMidYMid meet" : "xMidYMax slice"} className="h-full w-full">
             <defs>
               <path id="barc-ring" d="M500,338 m-268,0 a268,268 0 1,1 536,0 a268,268 0 1,1 -536,0" />
@@ -132,28 +163,53 @@ export default function JarStage() {
         </div>
 
         {/* the packs */}
-        <div className="absolute left-1/2 top-[46%] z-10 h-0 w-0 md:top-[50%]">
+        <div className="absolute left-1/2 top-[55%] z-10 h-0 w-0 md:top-[62%]">
           {PRODUCTS.map((p, i) => (
             <div
               key={p.slug}
               ref={(el) => { items.current[i] = el }}
-              className="absolute left-0 top-0 w-[clamp(132px,16vw,232px)] cursor-pointer will-change-transform"
+              className="absolute left-0 top-0 w-[clamp(116px,13vw,196px)] cursor-pointer will-change-transform"
               onPointerEnter={() => setCursor((c) => ({ ...c, on: true }))}
               onPointerLeave={() => setCursor((c) => ({ ...c, on: false }))}
-              onClick={() => { document.getElementById('range')?.scrollIntoView({ behavior: 'smooth' }) }}
+              onClick={() => setDetail(p)}
             >
-              <img src={p.image} alt={p.name} className="w-full object-contain" style={{ maxWidth: 'none' }} loading={i < 3 ? 'eager' : 'lazy'} />
+              <img
+                src={p.image}
+                alt={p.name}
+                className="w-full object-contain transition-opacity duration-300"
+                style={{ maxWidth: 'none', opacity: live && modelReady && active === i ? 0 : 1 }}
+                loading={i < 3 ? 'eager' : 'lazy'}
+              />
             </div>
           ))}
         </div>
 
-        {/* the reference states the proposition once, small, under the mark */}
-        <h1
-          className="absolute inset-x-0 top-[clamp(88px,13vh,140px)] z-20 mx-auto max-w-[30ch] px-6 text-center font-display text-[clamp(1.05rem,2.1vw,1.6rem)] font-light leading-snug"
-          style={{ color: 'var(--fg)' }}
-        >
-          {pick(COPY.hero.line1, lang)} {pick(COPY.hero.line2, lang)}
-        </h1>
+        {/* the live model sits exactly where the centre pack is */}
+        {live && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-[55%] z-[5] -translate-x-1/2 -translate-y-1/2 md:top-[62%]"
+            style={{ width: 'clamp(240px,27vw,420px)', height: 'clamp(300px,34vw,520px)' }}
+          >
+            <StagePack
+              src={PRODUCTS[active].model!}
+              texture={PRODUCTS[active].image}
+              tint={PRODUCTS[active].tint}
+              active
+              onReady={() => setModelReady(true)}
+            />
+          </div>
+        )}
+
+        <div className="pointer-events-none absolute inset-x-0 top-[clamp(72px,10vh,120px)] z-20 px-5 text-center">
+          <h1 className="display mx-auto max-w-[16ch] text-[clamp(2.1rem,7.6vw,6.4rem)] uppercase">
+            <span className="block">{pick(COPY.hero.line1, lang)}</span>
+            <span className="block italic" style={{ color: 'var(--accent)' }}>{pick(COPY.hero.line2, lang)}</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-[34ch] text-[clamp(.88rem,1.5vw,1.04rem)]" style={{ color: 'var(--fg-mute)' }}>
+            {pick(COPY.hero.sub, lang)}
+          </p>
+        </div>
 
         <p
           className="absolute inset-x-0 bottom-7 z-20 text-center font-mono text-[0.76rem] tracking-[0.2em] uppercase"
@@ -186,6 +242,8 @@ export default function JarStage() {
           {String(active + 1).padStart(2, '0')} / {String(PRODUCTS.length).padStart(2, '0')}
         </p>
       </div>
+
+      <ProductPanel product={detail} onClose={() => setDetail(null)} />
     </section>
   )
 }

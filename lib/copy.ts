@@ -25,8 +25,14 @@ export const COPY = {
 
   hero: {
     kicker: t('Laundry care system', 'Kir yuvish tizimi', 'Система ухода за бельём', 'نظام العناية بالغسيل'),
-    line1: t('One system,', 'Bitta tizim,', 'Одна система —', 'نظام واحد،'),
-    line2: t('every wash', 'har bir yuvish', 'каждая стирка', 'لكل غسلة'),
+    line1: t('Win over any', 'Istalgan kir ustidan', 'Победа над любым', 'انتصر على أي'),
+    line2: t('laundry', 'g‘alaba qozoning', 'пятном', 'غسيل'),
+    sub: t(
+      'Bärc is powerful results and careful care.',
+      'Bärc bu kuchli natija va ehtiyotkor parvarish.',
+      'Bärc — это мощный результат и бережный уход.',
+      'بيرك قوة في النتيجة ولطف في العناية.'
+    ),
     lede: t(
       'Capsules today. Powder, gel and stain remover next. One formula platform behind all of them — so every load gets the right format, and a retailer stocks one brand instead of four.',
       'Bugun kapsula. Keyin poroshok, gel va dog‘ ketkazuvchi. Barchasi ortida bitta formula platformasi — har bir yuvish uchun to‘g‘ri format, do‘kon uchun esa to‘rtta emas, bitta brend.',
@@ -41,6 +47,11 @@ export const COPY = {
   stage: {
     prompt: t('Scroll to discover', 'Ko‘rish uchun suring', 'Прокрутите, чтобы узнать', 'مرّر للاكتشاف'),
     discover: t('Discover the product', 'Mahsulotni ko‘rish', 'Посмотреть продукт', 'اكتشف المنتج'),
+    specs: t('At a glance', 'Qisqacha', 'Коротко', 'باختصار'),
+    scent: t('Scent', 'Ifor', 'Аромат', 'الرائحة'),
+    pack: t('Pack', 'Qadoq', 'Упаковка', 'العبوة'),
+    temp: t('Temperature', 'Harorat', 'Температура', 'درجة الحرارة'),
+    origin: t('Made in\nUnited Kingdom', 'Ishlab chiqarilgan\nBuyuk Britaniya', 'Произведено\nВеликобритания', 'صنع في\nالمملكة المتحدة'),
     ring: t('CLEAN · FRESH · DEPENDABLE · ', 'TOZA · YANGI · ISHONCHLI · ', 'ЧИСТО · СВЕЖО · НАДЁЖНО · ', 'نظيف · منعش · موثوق · '),
     menu: t('Menu', 'Menyu', 'Меню', 'القائمة'),
     close: t('Close', 'Yopish', 'Закрыть', 'إغلاق')
