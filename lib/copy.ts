@@ -38,6 +38,14 @@ export const COPY = {
     meta: t('Est. 2024 · Made in UK', '2024 dan · Buyuk Britaniyada', 'С 2024 · Сделано в Великобритании', 'منذ ٢٠٢٤ · صنع في بريطانيا')
   },
 
+  stage: {
+    prompt: t('Scroll to discover', 'Ko‘rish uchun suring', 'Прокрутите, чтобы узнать', 'مرّر للاكتشاف'),
+    discover: t('Discover the product', 'Mahsulotni ko‘rish', 'Посмотреть продукт', 'اكتشف المنتج'),
+    ring: t('CLEAN · FRESH · DEPENDABLE · ', 'TOZA · YANGI · ISHONCHLI · ', 'ЧИСТО · СВЕЖО · НАДЁЖНО · ', 'نظيف · منعش · موثوق · '),
+    menu: t('Menu', 'Menyu', 'Меню', 'القائمة'),
+    close: t('Close', 'Yopish', 'Закрыть', 'إغلاق')
+  },
+
   chain: {
     label: t('The system', 'Tizim', 'Система', 'النظام'),
     kicker: t('The range', 'Assortiment', 'Ассортимент', 'المنتجات'),

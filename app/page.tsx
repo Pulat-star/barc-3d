@@ -1,8 +1,8 @@
 'use client'
 import { useEffect } from 'react'
 import Navbar from '@/components/ui/Navbar'
-import Hero from '@/components/sections/Hero'
-import ProductOrbit from '@/components/sections/ProductOrbit'
+import JarStage from '@/components/sections/JarStage'
+
 import Range from '@/components/sections/Range'
 import Formula from '@/components/sections/Formula'
 import Showcase3D from '@/components/sections/Showcase3D'
@@ -32,8 +32,7 @@ export default function Page() {
     <>
       <Navbar />
       <main>
-        <Hero />
-        <ProductOrbit />
+        <JarStage />
         <Range />
         <HowTo />
         <Stats />

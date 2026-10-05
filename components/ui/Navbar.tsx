@@ -1,8 +1,9 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { COPY, pick, LANGS } from '@/lib/copy'
 import { useLang } from './LangContext'
 import Wordmark from './Wordmark'
+import Roll from './Roll'
 
 const LINKS = [
   { href: '#system', k: 'system' as const },
@@ -14,153 +15,157 @@ const LINKS = [
 export default function Navbar() {
   const { lang, setLang } = useLang()
   const [solid, setSolid] = useState(false)
-  const [hidden, setHidden] = useState(false)
-  const [light, setLight] = useState(false)
   const [open, setOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
-  const langBox = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let last = window.scrollY || 0
-    const on = () => {
-      const y = window.scrollY || 0
-      setSolid(y > 30)
-      if (Math.abs(y - last) > 8) {
-        setHidden(y > last && y > 120)
-        last = y
-      }
-    }
+    const on = () => setSolid((window.scrollY || 0) > 30)
     on()
     window.addEventListener('scroll', on, { passive: true })
     return () => window.removeEventListener('scroll', on)
   }, [])
 
-  // the one light section in a dark page flips the bar to dark ink
   useEffect(() => {
-    const marks = document.querySelectorAll('[data-nav="light"]')
-    if (!marks.length) return
-    const io = new IntersectionObserver(
-      (entries) => entries.forEach((e) => setLight(e.isIntersecting)),
-      { rootMargin: '0px 0px -94% 0px' }
-    )
-    marks.forEach((m) => io.observe(m))
-    return () => io.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!langOpen) return
-    const away = (e: MouseEvent) => {
-      if (!langBox.current?.contains(e.target as Node)) setLangOpen(false)
-    }
-    document.addEventListener('mousedown', away)
-    return () => document.removeEventListener('mousedown', away)
-  }, [langOpen])
-
-  const current = LANGS.find((l) => l.code === lang)!
+    document.body.style.overflow = open ? 'hidden' : ''
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('keydown', esc)
+    return () => { document.body.style.overflow = ''; document.removeEventListener('keydown', esc) }
+  }, [open])
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-500 ${solid ? 'backdrop-blur-xl' : ''}`}
-      data-light={light || undefined}
-      style={{
-        paddingTop: 'calc(0.85rem + var(--sa-top))',
-        paddingBottom: '0.85rem',
-        background: solid ? (light ? 'rgba(246,241,234,.82)' : 'color-mix(in srgb, var(--bg) 78%, transparent)') : 'transparent',
-        borderBottom: solid ? '1px solid color-mix(in srgb, var(--fg) 14%, transparent)' : '1px solid transparent',
-        color: light ? '#2A0846' : 'var(--fg)'
-      }}
-    >
-      <div className="wrap flex items-center justify-between gap-5">
-        <a href="#top" className="no-flip shrink-0"><Wordmark size="1.3rem" /></a>
+    <>
+      {/* a separate ground layer that fades in once the stage is behind us */}
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[clamp(68px,9vh,96px)]"
+        style={{
+          background: 'color-mix(in srgb, var(--bg) 80%, transparent)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid color-mix(in srgb, var(--fg) 12%, transparent)',
+          opacity: solid && !open ? 1 : 0,
+          transition: 'opacity .8s var(--ease-expo)'
+        }}
+      />
 
-        <nav
-          className="hidden items-center gap-7 text-[0.9rem] font-medium lg:flex"
-          style={{ color: light ? '#6B5A86' : 'var(--fg-mute)' }}
+      <header
+        className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-center justify-between"
+        style={{ padding: 'calc(var(--sa-top) + clamp(16px,2.4vw,30px)) clamp(16px,2.4vw,30px)' }}
+      >
+        {/* language: four circles where there is room, one that opens on phones */}
+        <div className="pointer-events-auto relative flex gap-1.5">
+          <div className="hidden gap-1.5 md:flex">
+            {LANGS.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => setLang(l.code)}
+                aria-pressed={l.code === lang}
+                className="grid h-9 w-9 place-items-center rounded-full font-mono text-[0.72rem] tracking-[0.06em] transition-colors duration-500"
+                style={l.code === lang
+                  ? { background: 'var(--accent)', color: '#2A0846', border: '1px solid var(--accent)' }
+                  : { color: 'var(--fg)', border: '1px solid color-mix(in srgb, var(--fg) 28%, transparent)' }}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => setLangOpen((v) => !v)}
+            className="grid h-9 w-9 place-items-center rounded-full font-mono text-[0.72rem] md:hidden"
+            style={{ background: 'var(--accent)', color: '#2A0846', border: '1px solid var(--accent)' }}
+            aria-expanded={langOpen}
+            aria-label="Language"
+          >
+            {LANGS.find((l) => l.code === lang)?.label}
+          </button>
+
+          {langOpen && (
+            <div className="absolute start-0 top-full mt-2 flex gap-1.5 md:hidden">
+              {LANGS.filter((l) => l.code !== lang).map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => { setLang(l.code); setLangOpen(false) }}
+                  className="grid h-9 w-9 place-items-center rounded-full font-mono text-[0.72rem]"
+                  style={{ color: 'var(--fg)', background: 'var(--bg-2)', border: '1px solid color-mix(in srgb, var(--fg) 28%, transparent)' }}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* the mark, centred */}
+        <a href="#top" className="pointer-events-auto absolute left-1/2 -translate-x-1/2 no-flip" aria-label="BÄRC">
+          <Wordmark size="1.35rem" />
+        </a>
+
+        <button
+          onClick={() => setOpen(true)}
+          className="pointer-events-auto flex items-center gap-2 rounded-full ps-4 pe-1.5 py-1.5 text-[0.76rem] font-semibold uppercase tracking-[0.04em] transition-colors duration-500 md:ps-5 md:pe-2 md:py-2 md:text-[0.82rem]"
+          style={{ color: 'var(--fg)', border: '1px solid color-mix(in srgb, var(--fg) 28%, transparent)' }}
+          aria-expanded={open}
         >
+          <Roll text={pick(COPY.stage.menu, lang)} />
+          <span className="grid h-7 w-7 place-items-center rounded-full" style={{ background: 'var(--accent)' }}>
+            <span style={{ width: 7, height: 7, borderRadius: 1, background: '#2A0846', transform: 'rotate(45deg)' }} />
+          </span>
+        </button>
+      </header>
+
+      {/* full-page nav */}
+      <div
+        className="fixed inset-0 z-[60] flex flex-col"
+        style={{
+          background: 'var(--violet, #7B3FBF)',
+          transform: open ? 'translateZ(0)' : 'translate3d(0,-100%,0)',
+          visibility: open ? 'visible' : 'hidden',
+          transition: open
+            ? 'transform .9s var(--ease-premium), visibility 0s linear 0s'
+            : 'transform .975s var(--ease-premium), visibility 0s linear .975s'
+        }}
+        aria-hidden={!open}
+      >
+        <div className="flex items-center justify-end" style={{ padding: 'calc(var(--sa-top) + clamp(16px,2.4vw,30px)) clamp(16px,2.4vw,30px)' }}>
+          <button
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 rounded-full ps-5 pe-2 py-2 font-semibold text-[0.82rem] uppercase tracking-[0.04em]"
+            style={{ color: '#fff', border: '1px solid rgba(255,255,255,.4)' }}
+          >
+            {open ? <Roll text={pick(COPY.stage.close, lang)} /> : pick(COPY.stage.close, lang)}
+            <span className="grid h-7 w-7 place-items-center rounded-full" style={{ background: '#fff' }}>
+              <span style={{ width: 9, height: 1.5, background: '#2A0846', transform: 'rotate(45deg)', position: 'absolute' }} />
+              <span style={{ width: 9, height: 1.5, background: '#2A0846', transform: 'rotate(-45deg)' }} />
+            </span>
+          </button>
+        </div>
+
+        <nav className="wrap flex flex-1 flex-col justify-center gap-0 pb-16" aria-label="Menu">
           {LINKS.map((l, i) => (
             <a
               key={l.href}
               href={l.href}
-              className="transition-[transform,opacity] duration-500"
-              style={{
-                transitionTimingFunction: 'var(--ease)',
-                transitionDelay: `${i * 25}ms`,
-                transform: hidden ? 'translateY(-220%)' : 'none',
-                opacity: hidden ? 0 : 1
-              }}
+              onClick={() => setOpen(false)}
+              className="group flex items-center gap-4 border-t py-5 md:py-7"
+              style={{ borderColor: 'rgba(255,255,255,.26)', color: '#fff' }}
             >
-              {pick(COPY.nav[l.k], lang)}
+              <span className="marker" style={{ background: '#fff' }} />
+              <span className="display text-[clamp(2rem,6.4vw,4.6rem)]" style={{ color: '#fff' }}>
+                {open ? <Roll text={pick(COPY.nav[l.k], lang)} delay={160 + i * 70} /> : pick(COPY.nav[l.k], lang)}
+              </span>
             </a>
           ))}
-        </nav>
 
-        <div className="flex items-center gap-2">
-          <div className="relative" ref={langBox}>
-            <button
-              onClick={() => setLangOpen((v) => !v)}
-              className="font-mono text-[0.76rem] tracking-[0.14em] uppercase px-2.5 py-1.5 rounded-full transition-colors"
-              style={{ color: 'inherit', border: '1px solid color-mix(in srgb, currentColor 30%, transparent)' }}
-              aria-haspopup="listbox"
-              aria-expanded={langOpen}
-            >
-              {current.label}
-            </button>
-            {langOpen && (
-              <div
-                role="listbox"
-                className="absolute end-0 top-full mt-2 grid min-w-[5.2rem] gap-0.5 rounded-2xl p-1.5"
-                style={{ background: 'var(--bg-2)', border: '1px solid color-mix(in srgb, var(--fg) 18%, transparent)' }}
-              >
-                {LANGS.map((l) => (
-                  <button
-                    key={l.code}
-                    role="option"
-                    aria-selected={l.code === lang}
-                    onClick={() => { setLang(l.code); setLangOpen(false) }}
-                    className="rounded-xl px-3 py-1.5 text-start font-mono text-[0.76rem] tracking-[0.14em] transition-colors"
-                    style={{
-                      background: l.code === lang ? 'var(--accent)' : 'transparent',
-                      color: l.code === lang ? '#2A0846' : 'var(--fg)'
-                    }}
-                  >
-                    {l.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <a href="#contact" className="btn btn-pink hidden sm:inline-flex !px-5 !py-2.5 !text-[0.84rem]">
+          <a
+            href="#contact"
+            onClick={() => setOpen(false)}
+            className="btn btn-pink mt-10 self-start"
+          >
             {pick(COPY.nav.cta, lang)}
           </a>
-          <button
-            className="btn btn-line !px-3.5 !py-2.5 !text-[0.82rem] lg:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-label="Menu"
-          >
-            {open ? '✕' : '☰'}
-          </button>
-        </div>
+        </nav>
       </div>
-
-      {open && (
-        <div className="wrap lg:hidden" style={{ paddingTop: '0.85rem' }}>
-          <div
-            className="grid gap-1 rounded-3xl p-5"
-            style={{ background: 'var(--bg-2)', border: '1px solid color-mix(in srgb, var(--fg) 16%, transparent)' }}
-          >
-            {LINKS.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)} className="display py-1.5 text-[1.4rem]">
-                {pick(COPY.nav[l.k], lang)}
-              </a>
-            ))}
-            <a href="#contact" onClick={() => setOpen(false)} className="btn btn-pink mt-3">
-              {pick(COPY.nav.cta, lang)}
-            </a>
-          </div>
-        </div>
-      )}
-    </header>
+    </>
   )
 }
