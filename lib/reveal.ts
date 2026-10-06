@@ -5,7 +5,9 @@ let io: IntersectionObserver | null = null
  * with a bottom margin would otherwise leave footer-level hero content invisible.
  */
 export function observeReveals(root: ParentNode = document) {
-  const targets = root.querySelectorAll<HTMLElement>('[data-rv]:not(.is-in)')
+  // `.line` carries no base style of its own — only its inner span moves — so
+  // it can share the same observer without being double-animated
+  const targets = root.querySelectorAll<HTMLElement>('[data-rv]:not(.is-in), .line:not(.is-in)')
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     targets.forEach((el) => el.classList.add('is-in'))
     return
@@ -34,6 +36,6 @@ export function observeReveals(root: ParentNode = document) {
 export function revealIn(root: HTMLElement | null) {
   if (!root) return
   requestAnimationFrame(() => {
-    root.querySelectorAll<HTMLElement>('[data-rv]:not(.is-in)').forEach((el) => el.classList.add('is-in'))
+    root.querySelectorAll<HTMLElement>('[data-rv]:not(.is-in), .line:not(.is-in)').forEach((el) => el.classList.add('is-in'))
   })
 }

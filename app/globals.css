@@ -3,28 +3,45 @@
 @tailwind utilities;
 
 :root{
-  /* easing set taken from the reference's motion system */
-  --ease-expo:cubic-bezier(.19,1,.22,1);
-  --ease-power:cubic-bezier(.165,.84,.44,1);
-  --ease-premium:cubic-bezier(.645,.045,.355,1);
-  --ease-soft:cubic-bezier(.22,1,.36,1);
+  /* Motion. The reference registers these five eases by name; the values are
+     read off its own bundle, so motion here matches it rather than guessing. */
+  --ease-page:cubic-bezier(.645,.045,.355,1);   /* page + overlay transitions */
+  --ease-line:cubic-bezier(.65,.05,.36,1);      /* rules drawing left to right */
+  --ease-veil:cubic-bezier(.165,1,.32,1);       /* text reveals */
+  --ease-mark:cubic-bezier(.22,1,.36,1);        /* markers, small chrome */
+  --ease:var(--ease-mark);
+
+  /* Palette. The Figma file is drawn in pink; the brief is that same design in
+     deep purple, so every pink token is the identical colour rotated
+     335deg -> 272deg, with the lead tone darkened until it reads as
+     "to'q binafsha". White on --grape measures 8.1:1; the pink it replaces
+     measured 3.9:1, so the change also fixes the contrast. */
+  --paper:#E0C6F9;        /* page surface            (Figma --paper #f9c6dc) */
+  --paper-2:#EFE1FB;      /* cards, arches, wells */
+  --grape:#7115C1;        /* the lead colour         (Figma --pink  #e93783) */
+  --grape-deep:#4A0D80;   /* pressed / shadowed grape */
+  --ink:#2D174B;          /* type                    (Figma --ink   #4b1732) */
+  --muted:#645879;        /* secondary type          (Figma --muted #79586b) */
+  --white:#FFFFFF;
+
+  --radius-full:999px;
   --round:15px;
+  --space-14:14px;
+  --space-26:26px;
+  /* Figma effect "BÄRC/Product depth", shadow colour rotated to match */
+  --depth:14px 28px 24px rgba(45,23,75,.22);
+
   --sa-top:env(safe-area-inset-top,0px);
   --sa-bot:env(safe-area-inset-bottom,0px);
-  /* written every frame by BackgroundLayer — one surface for the whole page */
-  --bg:#2E0A4F;
-  --bg-2:#431371;
-  --fg:#FFFFFF;
-  --fg-mute:#C4ACE6;
-  --accent:#F9B81F;
-  --violet:#7B3FBF;
-  color-scheme:dark;
+  color-scheme:light;
 }
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;background:transparent;color:var(--fg);
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
 }
@@ -32,107 +49,115 @@ img{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 
 @layer components{
-  .wrap{ @apply w-full max-w-[1480px] mx-auto px-5 md:px-10 lg:px-14; }
-  .kicker{
-    font-family:var(--font-mono),ui-monospace,monospace;
-    @apply text-[0.75rem] tracking-[0.2em] uppercase;
-    color:var(--accent);
-  }
+  .wrap{ @apply w-full max-w-[1440px] mx-auto px-6 md:px-10 lg:px-12; }
+
+  /* Type scale, straight off the Figma frames.
+     Hero is 92/88 at 1440 wide; as vw it floors so phones stay readable. */
   .display{
-    font-family:var(--font-display),Georgia,serif;
-    @apply font-light leading-[0.95] tracking-[-0.025em];
-    color:var(--fg);
+    font-family:var(--font-display),'Cormorant Garamond',Georgia,serif;
+    @apply font-medium;
+    color:var(--ink);
+    line-height:.96;
+    letter-spacing:-.005em;
   }
-  .lede{ @apply text-[0.95rem] md:text-[1.06rem] leading-[1.68] max-w-[34em]; color:var(--fg-mute); }
+  .eyebrow{
+    @apply text-[12px] font-semibold uppercase;
+    letter-spacing:.12em;
+    color:var(--ink);
+  }
+  .lede{ @apply text-[15px] leading-[21px]; color:var(--muted); }
+  .meta{ @apply text-[13px] leading-[18px]; color:var(--muted); }
+
+  /* BÄRC/Button — white and grape themes, desktop 48px / mobile 44px */
   .btn{
-    @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold
-           px-6 py-3.5 text-[0.9rem] whitespace-nowrap transition-transform duration-500;
+    @apply inline-flex items-center justify-center whitespace-nowrap
+           text-[14px] font-semibold leading-[16.8px];
+    padding:var(--space-14) var(--space-26);
     min-height:44px;
-    transition-timing-function:cubic-bezier(.16,1,.3,1);
+    border-radius:var(--radius-full);
+    transition:transform .42s var(--ease-mark), background-color .18s linear, color .18s linear;
   }
-  .btn:hover{ transform:translateY(-3px); }
-  .btn-pink{ background:var(--accent); color:#2A0846; }
-  .btn-line{ border:1px solid color-mix(in srgb, var(--fg) 26%, transparent); color:var(--fg); }
-  .btn-line:hover{ background:color-mix(in srgb, var(--fg) 7%, transparent); }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn-white{ background:var(--white); color:var(--ink); }
+  .btn-white:hover{ background:#F3EAFB; }
+  .btn-grape{ background:var(--grape); color:var(--white); }
+  .btn-grape:hover{ background:var(--grape-deep); }
+  .btn-line{ border:1px solid color-mix(in srgb, var(--ink) 22%, transparent); color:var(--ink); }
+  .btn-line:hover{ background:color-mix(in srgb, var(--ink) 6%, transparent); }
+
+  /* the arch the product cards and the product hero sit in */
+  .arch{
+    background:var(--paper-2);
+    border-radius:999px 999px var(--round) var(--round);
+  }
 }
 
-/* ---------------------------------------------------- one entrance language
-   Everything on the page enters the same way: rise 40px, unblur, fade in.
-   Nothing uses a second entrance style. */
-:root{ --ease:cubic-bezier(.22,1,.36,1); }
+@media (min-width:768px){ .btn{ min-height:48px; } }
 
+.depth{ filter:drop-shadow(var(--depth)); }
+
+/* ---------------------------------------------------- one entrance language
+   Everything enters the same way: rise, unblur, fade. Nothing uses a second. */
 [data-rv]{
   opacity:0;transform:translateY(40px);filter:blur(8px);
-  transition:opacity 1s var(--ease) var(--d,0ms),
-             transform 1.2s var(--ease) var(--d,0ms),
-             filter 1s var(--ease) var(--d,0ms);
+  transition:opacity .55s var(--ease-veil) var(--d,0ms),
+             transform .55s var(--ease-veil) var(--d,0ms),
+             filter .55s var(--ease-veil) var(--d,0ms);
 }
 [data-rv].is-in{opacity:1;transform:none;filter:none}
 
-/* headlines rise out of a line mask */
+/* headlines rise out of a line mask — the reference's "lines" mode:
+   .55s, 80ms apart, travelling 112% of their own height */
 .line{display:block;overflow:hidden;padding-bottom:.1em}
 .line__i{
-  display:block;transform:translateY(105%);filter:blur(6px);opacity:0;
-  transition:transform 1.2s var(--ease) var(--d,0ms),
-             filter 1s var(--ease) var(--d,0ms),
-             opacity .9s var(--ease) var(--d,0ms);
+  display:block;transform:translateY(112%);opacity:0;
+  transition:transform .55s var(--ease-veil) var(--d,0ms),
+             opacity .55s var(--ease-veil) var(--d,0ms);
 }
-.line.is-in .line__i{transform:none;filter:none;opacity:1}
+.line.is-in .line__i{transform:none;opacity:1}
 
-/* phones get the rise and fade without the blur: blurring many elements at once
-   is what costs a mobile GPU its framerate */
+/* phones get the rise and fade without the blur: blurring many elements at
+   once is what costs a mobile GPU its framerate */
 @media (pointer:coarse), (max-width:860px){
-  [data-rv]{filter:none;transform:translateY(32px)}
-  .line__i{filter:none}
+  [data-rv]{filter:none;transform:translateY(28px)}
 }
 
 @media (prefers-reduced-motion:reduce){
   [data-rv]{opacity:1;transform:none;filter:none;transition:none}
-  .line__i{transform:none;filter:none;opacity:1;transition:none}
+  .line__i{transform:none;opacity:1;transition:none}
 }
 
 /* ---------------------------------------------------------------- arabic */
 html.is-rtl body,
 html.is-rtl .font-sans { font-family: var(--font-ar), var(--font-sans), sans-serif; }
-/* Fraunces carries no Arabic, so headings switch to the Arabic face */
+/* Cormorant carries no Arabic, so headings switch to the Arabic face */
 html.is-rtl .display,
-html.is-rtl .font-display { font-family: var(--font-ar), sans-serif; font-weight: 400; letter-spacing: 0; line-height: 1.18; }
-html.is-rtl .kicker,
-html.is-rtl .font-mono { font-family: var(--font-ar), var(--font-mono), monospace; letter-spacing: 0.06em; }
+html.is-rtl .font-display { font-family: var(--font-ar), sans-serif; font-weight: 600; letter-spacing: 0; line-height: 1.18; }
+html.is-rtl .eyebrow { letter-spacing: .06em; }
 html.is-rtl .italic { font-style: normal; }
-/* the hero arc is laid out with explicit percentages; keep it unmirrored */
+/* the gallery is laid out with explicit offsets; keep it unmirrored */
 html.is-rtl .no-flip { direction: ltr; }
 
-/* ------------------------------------------------- the one light section
-   A single bright chapter in a dark page; the nav flips to dark ink over it. */
-.light-panel{
-  --fg:#2A0846;
-  --fg-mute:#6B5A86;
-  --accent:#6B2FB5;
-  background:#F6F1EA;
-  color:var(--fg);
-  border-radius:clamp(1.25rem,2.4vw,2.25rem);
-  padding-block:clamp(2.75rem,6vw,4.5rem);
-  padding-inline:clamp(1.25rem,4vw,3.5rem);
-}
-
-/* touch targets stay thumb-sized on phones and tablets */
+/* touch targets stay thumb-sized on phones and tablets. Plain text links are
+   17-21px tall, so they carry .tap: it only grows the hit area, and only where
+   there is no fine pointer, so the desktop layout is untouched. */
 @media (pointer:coarse){
   button, .btn, a.btn { min-height:44px; }
+  .tap { min-height:44px; display:inline-flex; align-items:center; }
 }
 
 /* ------------------------------------------------- character roll reveal
    Each glyph rides up out of its own mask, 18 ms apart — the reference uses
    this for nav links and menu labels. */
 .roll{display:inline-flex;overflow:hidden;vertical-align:bottom}
-.roll__c{display:block;transform:translate3d(0,100%,0);transition:transform .35s cubic-bezier(.4,0,.2,1);transition-delay:calc(var(--i,0)*18ms)}
+.roll__c{display:block;transform:translate3d(0,100%,0);transition:transform .35s var(--ease-mark);transition-delay:calc(var(--i,0)*18ms)}
 .roll.is-in .roll__c{transform:translateZ(0)}
-.roll--space{width:.32em}
+.roll--space{width:.24em}
 
 /* a small diamond marker that pops up on hover, as on the reference's links */
-.marker{display:inline-block;width:.42em;height:.42em;border-radius:1px;background:var(--accent);
+.marker{display:inline-block;width:.42em;height:.42em;border-radius:1px;background:var(--grape);
   transform:translate3d(0,165%,0) rotate(45deg);transform-origin:center;
-  transition:transform .6s var(--ease-premium)}
+  transition:transform .6s var(--ease-page)}
 a:hover > .marker,button:hover > .marker,.is-on > .marker{transform:translateZ(0) rotate(45deg)}
 
 @media (prefers-reduced-motion:reduce){

@@ -1,59 +1,46 @@
 'use client'
 import { useEffect } from 'react'
-import Navbar from '@/components/ui/Navbar'
-import JarStage from '@/components/sections/JarStage'
-
-import Range from '@/components/sections/Range'
-import Formula from '@/components/sections/Formula'
-import Showcase3D from '@/components/sections/Showcase3D'
-import HowTo from '@/components/sections/HowTo'
-import Stats from '@/components/sections/Stats'
-import Lifestyle from '@/components/sections/Lifestyle'
-import Contact from '@/components/sections/Contact'
+import Header from '@/components/site/Header'
+import Gallery from '@/components/site/Gallery'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
-import { ScrollTrigger, registerGsap } from '@/lib/masterTimeline'
-import Wordmark from '@/components/ui/Wordmark'
 
-export default function Page() {
+/**
+ * 01 Desktop · Home — the slogan, then the gallery on its dome. The frame in
+ * the design is exactly one screen tall, so the page ends at the strip under
+ * the controls; everything else is reached from the menu or "all products".
+ */
+export default function Home() {
   const { lang } = useLang()
+  const home = COPY.site.home
 
-  useEffect(() => {
-    registerGsap()
-    observeReveals()
-    // fonts and lazy images change section heights — re-measure the pin once settled
-    const t = window.setTimeout(() => ScrollTrigger.refresh(), 450)
-    document.fonts?.ready.then(() => ScrollTrigger.refresh())
-    return () => window.clearTimeout(t)
-  }, [])
+  useEffect(() => { observeReveals() }, [lang])
 
   return (
     <>
-      <Navbar />
-      <main>
-        <JarStage />
-        <Range />
-        <HowTo />
-        <Stats />
-        <Formula />
-        <Showcase3D />
-        <Lifestyle />
-        <Contact />
-      </main>
-      <footer className="relative py-12" style={{ borderTop: '1px solid color-mix(in srgb, var(--fg) 12%, transparent)' }}>
-        <div className="wrap flex flex-col items-start justify-between gap-5 md:flex-row md:items-center">
-          <div>
-            <div className="no-flip"><Wordmark size="1.6rem" /></div>
-            <p className="font-display mt-3 text-[1rem] italic" style={{ color: 'var(--accent)' }}>
-              {pick(COPY.footer.tag, lang)}
-            </p>
-          </div>
-          <p className="font-mono text-[0.76rem] tracking-[0.14em] uppercase" style={{ color: 'var(--fg-mute)' }}>
-            © {new Date().getFullYear()} · {pick(COPY.footer.rights, lang)}
+      <Header />
+      <main style={{ paddingTop: 'calc(88px + var(--sa-top))' }}>
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-[18px] px-6 pb-8 pt-8 text-center md:px-12 md:pb-12 md:pt-9">
+          <p className="eyebrow" data-rv>{pick(home.eyebrow, lang)}</p>
+
+          <h1 className="display mx-auto max-w-[1100px] text-[clamp(2.5rem,6.4vw,5.75rem)]">
+            <span className="line"><span className="line__i">{pick(home.s1, lang)}</span></span>
+            <span className="line">
+              <span className="line__i" style={{ ['--d' as string]: '80ms' }}>
+                <span className="italic" style={{ color: 'var(--grape)' }}>{pick(home.s2, lang)}</span>
+                {pick(home.s3, lang)}
+              </span>
+            </span>
+          </h1>
+
+          <p className="lede max-w-[800px]" data-rv style={{ ['--d' as string]: '160ms' }}>
+            {pick(home.promise, lang)}
           </p>
         </div>
-      </footer>
+
+        <Gallery />
+      </main>
     </>
   )
 }

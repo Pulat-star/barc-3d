@@ -5,14 +5,27 @@ import { gsap, ScrollTrigger, registerGsap } from '@/lib/masterTimeline'
 
 /**
  * Lenis drives scrolling; ScrollTrigger is told about every frame so the pinned
- * chain stays locked to the smoothed position instead of the native one.
+ * sections stay locked to the smoothed position instead of the native one.
+ *
+ * The numbers are the reference's, not defaults. `syncTouch` is the one that
+ * matters most: without it a phone falls back to native momentum and the heavy,
+ * silky feel that the whole design rests on only exists on desktop.
  */
 export default function SmoothScroll() {
   useEffect(() => {
     registerGsap()
+    // reduced motion turns smooth scrolling off outright rather than damping it
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const lenis = new Lenis({ lerp: 0.1, wheelMultiplier: 0.9, smoothWheel: true })
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      infinite: false,
+      smoothWheel: true,
+      syncTouch: true,
+      syncTouchLerp: 0.085,
+      autoRaf: false
+    })
     lenis.on('scroll', ScrollTrigger.update)
 
     const tick = (time: number) => lenis.raf(time * 1000)
