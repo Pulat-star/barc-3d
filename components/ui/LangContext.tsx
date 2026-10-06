@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { LANGS, type Lang } from '@/lib/copy'
 
 const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; dir: 'ltr' | 'rtl' }>({
-  lang: 'en',
+  lang: 'uz',
   setLang: () => {},
   dir: 'ltr'
 })
@@ -11,7 +11,7 @@ const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void; dir: 'ltr' |
 const dirOf = (l: Lang) => LANGS.find((x) => x.code === l)?.dir ?? 'ltr'
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>('en')
+  const [lang, setLangState] = useState<Lang>('uz')
   const dir = dirOf(lang)
 
   // remember the choice, and mirror the document for Arabic

@@ -20,13 +20,13 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#E0C6F9'
+  themeColor: '#1A0735'
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="en"
+      lang="uz"
       className={`${sans.variable} ${display.variable} ${mono.variable} ${brand.variable} ${arabic.variable}`}
     >
       <body className="font-sans">

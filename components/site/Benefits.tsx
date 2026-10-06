@@ -13,12 +13,12 @@ const ICONS = [
 ]
 
 /** BÄRC/Benefits — the one saturated band on an otherwise pale page. */
-export default function Benefits() {
+export default function Benefits({ id }: { id?: string }) {
   const { lang } = useLang()
   const b = COPY.site.benefits
 
   return (
-    <section style={{ background: 'var(--grape)', color: 'var(--white)' }}>
+    <section id={id} style={{ background: 'var(--grape)', color: 'var(--white)' }}>
       <div className="mx-auto max-w-[1440px] px-6 py-16 text-center md:px-12 md:py-24">
         <p className="eyebrow" style={{ color: 'rgba(255,255,255,.72)' }} data-rv>
           {pick(b.eyebrow, lang)}

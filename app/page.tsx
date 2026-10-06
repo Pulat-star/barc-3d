@@ -1,46 +1,76 @@
 'use client'
 import { useEffect } from 'react'
 import Header from '@/components/site/Header'
+import Footer from '@/components/site/Footer'
 import Gallery from '@/components/site/Gallery'
+import ProductCard from '@/components/site/ProductCard'
+import Benefits from '@/components/site/Benefits'
+import Usage from '@/components/site/Usage'
+import { RELEASED } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
+import { ScrollTrigger, registerGsap } from '@/lib/masterTimeline'
+import Link from 'next/link'
 
 /**
- * 01 Desktop · Home — the slogan, then the gallery on its dome. The frame in
- * the design is exactly one screen tall, so the page ends at the strip under
- * the controls; everything else is reached from the menu or "all products".
+ * Home. The first screen is pinned, so scrolling turns the carousel rather
+ * than moving the page; the sections below are what the pin releases into.
  */
 export default function Home() {
   const { lang } = useLang()
-  const home = COPY.site.home
+  const site = COPY.site
 
-  useEffect(() => { observeReveals() }, [lang])
+  useEffect(() => {
+    registerGsap()
+    observeReveals()
+    // fonts settle after first paint and change the pin's measurements
+    const t = window.setTimeout(() => ScrollTrigger.refresh(), 420)
+    document.fonts?.ready.then(() => ScrollTrigger.refresh())
+    return () => window.clearTimeout(t)
+  }, [lang])
 
   return (
     <>
       <Header />
-      <main style={{ paddingTop: 'calc(88px + var(--sa-top))' }}>
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-[18px] px-6 pb-8 pt-8 text-center md:px-12 md:pb-12 md:pt-9">
-          <p className="eyebrow" data-rv>{pick(home.eyebrow, lang)}</p>
-
-          <h1 className="display mx-auto max-w-[1100px] text-[clamp(2.5rem,6.4vw,5.75rem)]">
-            <span className="line"><span className="line__i">{pick(home.s1, lang)}</span></span>
-            <span className="line">
-              <span className="line__i" style={{ ['--d' as string]: '80ms' }}>
-                <span className="italic" style={{ color: 'var(--grape)' }}>{pick(home.s2, lang)}</span>
-                {pick(home.s3, lang)}
-              </span>
-            </span>
-          </h1>
-
-          <p className="lede max-w-[800px]" data-rv style={{ ['--d' as string]: '160ms' }}>
-            {pick(home.promise, lang)}
-          </p>
-        </div>
-
+      <main>
         <Gallery />
+
+        <section id="mahsulotlar" className="mx-auto max-w-[1440px] px-6 py-16 md:px-12 md:py-24">
+          <div className="text-center">
+            <p className="eyebrow" data-rv>{pick(site.products.eyebrow, lang)}</p>
+            <h2 className="display mx-auto mt-5 max-w-[20ch] text-[clamp(2rem,5vw,3.6rem)]">
+              <span className="line"><span className="line__i">{pick(site.products.title, lang)}</span></span>
+            </h2>
+            <p className="lede mx-auto mt-4 max-w-[52ch]" data-rv style={{ ['--d' as string]: '120ms' }}>
+              {pick(site.products.sub, lang)}
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3 md:gap-10">
+            {RELEASED.map((p, i) => (
+              <ProductCard key={p.slug} product={p} delay={i * 110} />
+            ))}
+          </div>
+        </section>
+
+        <Benefits id="afzalliklar" />
+        <Usage id="qanday-ishlatiladi" />
+
+        <section id="barc-haqida" className="mx-auto max-w-[1440px] px-6 py-16 text-center md:px-12 md:py-24">
+          <p className="eyebrow" data-rv>{pick(site.brand.eyebrow, lang)}</p>
+          <h2 className="display mx-auto mt-5 max-w-[18ch] text-[clamp(2rem,5vw,3.6rem)]">
+            <span className="line"><span className="line__i">{pick(site.brand.title, lang)}</span></span>
+          </h2>
+          <p className="lede mx-auto mt-5 max-w-[52ch]" data-rv style={{ ['--d' as string]: '120ms' }}>
+            {pick(site.brand.body, lang)}
+          </p>
+          <Link href="/mahsulotlar/" className="btn btn-grape mt-9" data-rv style={{ ['--d' as string]: '200ms' }}>
+            {pick(site.home.cta, lang)}
+          </Link>
+        </section>
       </main>
+      <Footer />
     </>
   )
 }

@@ -9,13 +9,14 @@ export default function Footer() {
   const nav = COPY.site.nav
 
   const links = [
-    { href: '/products/', label: pick(nav.products, lang) },
-    { href: '/usage/', label: pick(nav.usage, lang) },
-    { href: '/about/', label: pick(nav.about, lang) }
+    { href: '/mahsulotlar/', label: pick(nav.products, lang) },
+    { href: '/#afzalliklar', label: pick(nav.benefits, lang) },
+    { href: '/#qanday-ishlatiladi', label: pick(nav.usage, lang) },
+    { href: '/#barc-haqida', label: pick(nav.about, lang) }
   ]
 
   return (
-    <footer style={{ background: 'var(--paper-2)' }}>
+    <footer style={{ background: 'var(--paper-deep)' }}>
       <div
         className="mx-auto flex max-w-[1440px] flex-col gap-10 px-6 py-14 md:px-12 md:py-20"
         style={{ paddingBottom: 'calc(3.5rem + var(--sa-bot))' }}

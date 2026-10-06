@@ -3,18 +3,16 @@ import { useEffect } from 'react'
 import Header from '@/components/site/Header'
 import Footer from '@/components/site/Footer'
 import ProductCard from '@/components/site/ProductCard'
-import { PRODUCTS } from '@/lib/products'
+import { RELEASED } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
 
-/** 02 Desktop · Products — the three released scents, side by side. */
-export default function ProductsPage() {
+/** The catalogue: the released scents, side by side. */
+export default function Catalogue() {
   const { lang } = useLang()
   const p = COPY.site.products
   useEffect(() => { observeReveals() }, [lang])
-
-  const shown = PRODUCTS.filter((x) => x.available)
 
   return (
     <>
@@ -31,7 +29,7 @@ export default function ProductsPage() {
         </div>
 
         <div className="mx-auto grid max-w-[1340px] gap-6 px-6 pb-20 md:grid-cols-3 md:gap-12 md:px-12 md:pb-28">
-          {shown.map((product, i) => (
+          {RELEASED.map((product, i) => (
             <ProductCard key={product.slug} product={product} delay={i * 110} />
           ))}
         </div>

@@ -1,44 +1,100 @@
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 export const asset = (p: string) => `${BASE}/${p.replace(/^\//, '')}`
 
+/** A label in the four site languages. */
+export type Entry = Record<'en' | 'uz' | 'ru' | 'ar', string>
+
 export type Product = {
+  id: number
   slug: string
-  /** Shown as the product's own name. */
+  /** The variant name exactly as printed on the pack. */
   name: string
-  /** Category — the brand is organised by these, not by a single hero SKU. */
-  category: 'pods' | 'powder' | 'gel' | 'stain'
-  image: string
-  /** Draco-compressed GLB, where a 3D scan exists for that pack. */
-  model?: string
-  /** Accent used for glow and chrome while this product leads the chain. */
-  tint: string
-  available: boolean
+  /** Every claim here is read off the packaging or the brand's own artwork. */
+  description: Entry
+  /** The pack's own colour, for chrome that has to agree with it. */
+  packagingColor: string
+  images: {
+    /** Front cutout, transparent background. */
+    front: string
+    /** Extra angles, when a faithful one exists. */
+    extra?: string[]
+  }
+  /** Pods per pack, as marked on the pack. */
+  quantity: number
+  /** Indexes into COPY.site.benefits.items — the pack's three claims. */
+  benefits: number[]
+  /** Indexes into COPY.site.usage.steps. */
+  usage: number[]
+  /** Set once a real shop link exists; nothing renders while it is null. */
+  purchaseUrl: string | null
+  /** False keeps a line out of the catalogue until it is confirmed. */
+  released: boolean
 }
 
-export const DRACO_PATH = asset('draco/gltf/')
+const t = (en: string, uz: string, ru: string, ar: string): Entry => ({ en, uz, ru, ar })
 
 /**
- * Every pods line ships in the same stand-up pouch — only the artwork differs.
- * One mesh serves all three; the pack's own photograph is re-projected onto it
- * at render time, so the packaging stays exactly as printed.
+ * The pack prints "REMOVES TOUGH STAINS & ODRS / EVEN IN COLD AND SHORT" and
+ * the brand's own artwork renders the same line in Uzbek. Nothing beyond what
+ * is printed goes in here: no origin, no certification, no percentages.
  */
-const POUCH = asset('models/pack-pouch.glb')
+const PACK_CLAIM = t(
+  'Powerful against tough stains and odours — even on a cold, short cycle.',
+  'Qiyin dog‘lar va hidlarga qarshi kuchli ta’sir — sovuq va qisqa dasturda ham.',
+  'Сильное действие против стойких пятен и запахов — даже в холодной и короткой программе.',
+  'فعّال ضد البقع والروائح العنيدة — حتى في دورة باردة وقصيرة.'
+)
 
 /**
- * The brand is a system, not one product. Adding a new line means adding an
- * entry here — the hero cluster, the scroll chain and the catalogue all read
- * from this array and size themselves to its length.
+ * One source of truth. A new line is one entry here; the gallery, the
+ * catalogue and the product routes all read from this array.
  */
 export const PRODUCTS: Product[] = [
-  { slug: 'amethyst', name: 'Amethyst',      category: 'pods',   image: asset('products/amethyst.webp'), model: POUCH, tint: '#9B4EE6', available: true },
-  { slug: 'crystal',  name: 'Crystal Bloom', category: 'pods',   image: asset('products/crystal.webp'),  model: POUCH, tint: '#3E8BF5', available: true },
-  { slug: 'original', name: 'Original',      category: 'pods',   image: asset('products/original.webp'), model: POUCH, tint: '#3FB866', available: true },
-  { slug: 'powder',   name: 'Powder',        category: 'powder', image: asset('products/powder.webp'),   tint: '#F9B81F', available: false },
-  { slug: 'gel',      name: 'Gel',           category: 'gel',    image: asset('products/gel.webp'),      tint: '#F9B81F', available: false },
-  { slug: 'stain',    name: 'Stain Remover', category: 'stain',  image: asset('products/spray.webp'),    tint: '#F9B81F', available: false }
+  {
+    id: 1,
+    slug: 'amethyst',
+    name: 'Amethyst',
+    description: PACK_CLAIM,
+    packagingColor: '#5B2150',
+    images: {
+      front: asset('products/amethyst.webp'),
+      extra: [asset('products/amethyst-closeup.webp')]
+    },
+    quantity: 60,
+    benefits: [0, 1, 2],
+    usage: [0, 1, 2],
+    purchaseUrl: null,
+    released: true
+  },
+  {
+    id: 2,
+    slug: 'crystal-bloom',
+    name: 'Crystal Bloom',
+    description: PACK_CLAIM,
+    packagingColor: '#123E86',
+    images: { front: asset('products/crystal.webp') },
+    quantity: 60,
+    benefits: [0, 1, 2],
+    usage: [0, 1, 2],
+    purchaseUrl: null,
+    released: true
+  },
+  {
+    id: 3,
+    slug: 'original',
+    name: 'Original',
+    description: PACK_CLAIM,
+    packagingColor: '#2E6B1F',
+    images: { front: asset('products/original.webp') },
+    quantity: 60,
+    benefits: [0, 1, 2],
+    usage: [0, 1, 2],
+    purchaseUrl: null,
+    released: true
+  }
 ]
 
-export const SCENES = {
-  shirtDirty: asset('scenes/shirt-dirty.webp'),
-  shirtClean: asset('scenes/shirt-clean.webp')
-}
+/** Everything the catalogue and the gallery show. */
+export const RELEASED = PRODUCTS.filter((p) => p.released)
+
+export const bySlug = (slug: string) => PRODUCTS.find((p) => p.slug === slug)

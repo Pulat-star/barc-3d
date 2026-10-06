@@ -6,23 +6,22 @@ import Footer from '@/components/site/Footer'
 import Benefits from '@/components/site/Benefits'
 import Usage from '@/components/site/Usage'
 import ProductCard from '@/components/site/ProductCard'
-import { PRODUCTS } from '@/lib/products'
+import { RELEASED, bySlug } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 import { observeReveals } from '@/lib/reveal'
 
-/** 03–05 Desktop · a scent: the pack in its arch, then the two shared bands. */
+/** A scent's own page: the pack in its arch, then the two shared bands. */
 export default function ProductView({ slug }: { slug: string }) {
   const { lang } = useLang()
   const site = COPY.site
   useEffect(() => { observeReveals() }, [lang, slug])
 
-  const product = PRODUCTS.find((p) => p.slug === slug)
+  const product = bySlug(slug)
   if (!product) return null
 
   const scent = site.scent[product.slug]
-  const detail = COPY.chain.detail[product.slug]
-  const related = PRODUCTS.filter((p) => p.available && p.slug !== slug)
+  const related = RELEASED.filter((p) => p.slug !== slug)
 
   return (
     <>
@@ -30,7 +29,7 @@ export default function ProductView({ slug }: { slug: string }) {
       <main style={{ paddingTop: 'calc(88px + var(--sa-top))' }}>
         <div className="mx-auto grid max-w-[1440px] items-center gap-10 px-6 pb-14 pt-8 md:grid-cols-2 md:gap-16 md:px-12 md:pb-20 md:pt-12">
           <div className="order-2 text-center md:order-1 md:text-left">
-            <Link href="/products/" className="group tap inline-flex items-center gap-2 text-[13px]" style={{ color: 'var(--muted)' }} data-rv>
+            <Link href="/mahsulotlar/" className="group tap inline-flex items-center gap-2 text-[13px]" style={{ color: 'var(--muted)' }} data-rv>
               <span className="marker" />
               {pick(site.product.back, lang)}
             </Link>
@@ -39,30 +38,66 @@ export default function ProductView({ slug }: { slug: string }) {
               <span className="line"><span className="line__i">{product.name}</span></span>
             </h1>
 
-            {scent && <p className="mt-3 text-[clamp(1rem,1.5vw,1.2rem)]" style={{ color: 'var(--grape)' }} data-rv>{pick(scent, lang)}</p>}
-            {detail && <p className="lede mx-auto mt-5 max-w-[44ch] md:mx-0" data-rv style={{ ['--d' as string]: '90ms' }}>{pick(detail, lang)}</p>}
+            {scent && (
+              <p className="mt-3 text-[clamp(1rem,1.5vw,1.2rem)]" style={{ color: 'var(--gold)' }} data-rv>
+                {pick(scent, lang)}
+              </p>
+            )}
+            <p className="lede mx-auto mt-5 max-w-[46ch] md:mx-0" data-rv style={{ ['--d' as string]: '90ms' }}>
+              {pick(product.description, lang)}
+            </p>
 
             <ul className="mt-7 flex flex-wrap justify-center gap-x-7 gap-y-2 text-[13px] md:justify-start" style={{ color: 'var(--muted)' }} data-rv>
-              <li>{pick(site.product.spec1, lang)}</li>
-              <li>{pick(site.product.spec2, lang)}</li>
-              <li>{pick(site.product.spec3, lang)}</li>
+              <li>{pick(site.product.spec, lang)}</li>
+              <li>{product.quantity} {pick(site.products.units, lang).split('·')[0].trim()}</li>
+              <li>{pick(site.product.kind, lang)}</li>
             </ul>
 
-            <Link href="/usage/" className="btn btn-white mt-8" data-rv style={{ ['--d' as string]: '180ms' }}>
+            <Link href="/#qanday-ishlatiladi" className="btn btn-white mt-8" data-rv style={{ ['--d' as string]: '180ms' }}>
               {pick(site.product.howto, lang)}
             </Link>
           </div>
 
           <div className="arch order-1 flex flex-col items-center px-6 pb-8 pt-12 md:order-2" data-rv>
             <img
-              src={product.image}
-              alt={product.name}
-              className="depth h-[clamp(240px,34vw,480px)] w-auto object-contain"
+              src={product.images.front}
+              alt={`BÄRC ${product.name} — 3in1 PODS kir yuvish kapsulalari, ${product.quantity} dona`}
+              width={664}
+              height={900}
+              className="depth h-[clamp(240px,34vw,460px)] w-auto object-contain"
               style={{ maxWidth: 'none' }}
             />
             <p className="eyebrow mt-6" style={{ color: 'var(--muted)' }}>BÄRC · {product.name}</p>
           </div>
         </div>
+
+        {/* a closer look, only where a faithful extra shot exists */}
+        {product.images.extra?.length ? (
+          <section className="mx-auto max-w-[1440px] px-6 pb-16 md:px-12 md:pb-24">
+            <div
+              className="flex flex-col items-center gap-8 rounded-[var(--round)] px-6 py-12 md:flex-row md:gap-16 md:px-16"
+              style={{ background: 'var(--paper-2)', border: '1px solid color-mix(in srgb, var(--lav) 22%, transparent)' }}
+              data-rv
+            >
+              <img
+                src={product.images.extra[0]}
+                alt={`BÄRC ${product.name} qadog‘i va 3in1 kapsulalari yaqindan`}
+                width={668}
+                height={900}
+                className="h-[clamp(220px,28vw,380px)] w-auto object-contain"
+                style={{ maxWidth: 'none' }}
+                loading="lazy"
+              />
+              <div className="text-center md:text-left">
+                <p className="eyebrow">{pick(site.product.spec, lang)}</p>
+                <h2 className="display mt-4 text-[clamp(1.7rem,3.4vw,2.6rem)]">
+                  {product.quantity} {pick(site.products.units, lang).split('·')[0].trim()}
+                </h2>
+                <p className="lede mx-auto mt-4 max-w-[38ch] md:mx-0">{pick(product.description, lang)}</p>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         <Benefits />
         <Usage />

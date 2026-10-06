@@ -11,17 +11,21 @@
   --ease-mark:cubic-bezier(.22,1,.36,1);        /* markers, small chrome */
   --ease:var(--ease-mark);
 
-  /* Palette. The Figma file is drawn in pink; the brief is that same design in
-     deep purple, so every pink token is the identical colour rotated
-     335deg -> 272deg, with the lead tone darkened until it reads as
-     "to'q binafsha". White on --grape measures 8.1:1; the pink it replaces
-     measured 3.9:1, so the change also fixes the contrast. */
-  --paper:#E0C6F9;        /* page surface            (Figma --paper #f9c6dc) */
-  --paper-2:#EFE1FB;      /* cards, arches, wells */
-  --grape:#7115C1;        /* the lead colour         (Figma --pink  #e93783) */
-  --grape-deep:#4A0D80;   /* pressed / shadowed grape */
-  --ink:#2D174B;          /* type                    (Figma --ink   #4b1732) */
-  --muted:#645879;        /* secondary type          (Figma --muted #79586b) */
+  /* Palette — the values given in the brief, taken from the brand's own
+     purple artwork. Measured against --paper: white 18.7:1, --muted 13.0:1,
+     --gold 13.0:1, --lav 6.8:1; white on --grape 6.9:1. --paper-2 sits only
+     1.1:1 off the surface, so panels built from it carry a hairline edge
+     rather than relying on fill alone. */
+  --paper:#1A0735;        /* page surface */
+  --paper-deep:#120427;   /* the deepest well — footer, menu backdrop */
+  --paper-2:#2A0F46;      /* cards, arches, lifted panels */
+  --grape:#7E4096;        /* bright violet accent — dome, bands */
+  --grape-deep:#5E2C72;   /* pressed grape */
+  --lav:#B58BDC;          /* soft lavender accent */
+  --ink:#FFFFFF;          /* primary type */
+  --muted:#DED3EB;        /* secondary type */
+  --gold:#FFD33D;         /* small pack-related emphasis only */
+  --accent:var(--gold);
   --white:#FFFFFF;
 
   --radius-full:999px;
@@ -29,11 +33,11 @@
   --space-14:14px;
   --space-26:26px;
   /* Figma effect "BÄRC/Product depth", shadow colour rotated to match */
-  --depth:14px 28px 24px rgba(45,23,75,.22);
+  --depth:14px 28px 26px rgba(0,0,0,.45);
 
   --sa-top:env(safe-area-inset-top,0px);
   --sa-bot:env(safe-area-inset-bottom,0px);
-  color-scheme:light;
+  color-scheme:dark;
 }
 
 *{box-sizing:border-box}
@@ -78,8 +82,8 @@ a{color:inherit;text-decoration:none}
     transition:transform .42s var(--ease-mark), background-color .18s linear, color .18s linear;
   }
   .btn:hover{ transform:translateY(-2px); }
-  .btn-white{ background:var(--white); color:var(--ink); }
-  .btn-white:hover{ background:#F3EAFB; }
+  .btn-white{ background:var(--white); color:var(--paper); }
+  .btn-white:hover{ background:#EDE2FA; }
   .btn-grape{ background:var(--grape); color:var(--white); }
   .btn-grape:hover{ background:var(--grape-deep); }
   .btn-line{ border:1px solid color-mix(in srgb, var(--ink) 22%, transparent); color:var(--ink); }
@@ -88,6 +92,7 @@ a{color:inherit;text-decoration:none}
   /* the arch the product cards and the product hero sit in */
   .arch{
     background:var(--paper-2);
+    border:1px solid color-mix(in srgb, var(--lav) 22%, transparent);
     border-radius:999px 999px var(--round) var(--round);
   }
 }
@@ -138,12 +143,23 @@ html.is-rtl .italic { font-style: normal; }
 /* the gallery is laid out with explicit offsets; keep it unmirrored */
 html.is-rtl .no-flip { direction: ltr; }
 
+/* keyboard focus: the browser default is a dark ring on a dark page, so it is
+   replaced with the gold the brand already uses for emphasis */
+:focus-visible{
+  outline:2px solid var(--gold);
+  outline-offset:3px;
+  border-radius:4px;
+}
+
 /* touch targets stay thumb-sized on phones and tablets. Plain text links are
    17-21px tall, so they carry .tap: it only grows the hit area, and only where
    there is no fine pointer, so the desktop layout is untouched. */
 @media (pointer:coarse){
   button, .btn, a.btn { min-height:44px; }
-  .tap { min-height:44px; display:inline-flex; align-items:center; }
+  /* :not(.hidden) matters: .tap sets a display, and a later rule of equal
+     specificity would otherwise override Tailwind's `hidden` and bring back
+     links that are meant to be hidden at this width */
+  .tap:not(.hidden) { min-height:44px; display:inline-flex; align-items:center; }
 }
 
 /* ------------------------------------------------- character roll reveal
@@ -155,7 +171,7 @@ html.is-rtl .no-flip { direction: ltr; }
 .roll--space{width:.24em}
 
 /* a small diamond marker that pops up on hover, as on the reference's links */
-.marker{display:inline-block;width:.42em;height:.42em;border-radius:1px;background:var(--grape);
+.marker{display:inline-block;width:.42em;height:.42em;border-radius:1px;background:var(--accent);
   transform:translate3d(0,165%,0) rotate(45deg);transform-origin:center;
   transition:transform .6s var(--ease-page)}
 a:hover > .marker,button:hover > .marker,.is-on > .marker{transform:translateZ(0) rotate(45deg)}

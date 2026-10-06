@@ -2,13 +2,13 @@
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
 
-/** BÄRC/Usage — the heading holds the left column, the three steps the right. */
-export default function Usage() {
+/** The heading holds the left column, the three steps the right. */
+export default function Usage({ id }: { id?: string }) {
   const { lang } = useLang()
   const u = COPY.site.usage
 
   return (
-    <section style={{ background: 'var(--paper-2)' }}>
+    <section id={id} style={{ background: 'var(--paper-2)' }}>
       <div className="mx-auto grid max-w-[1440px] gap-12 px-6 py-16 md:grid-cols-2 md:gap-20 md:px-12 md:py-24">
         <div>
           <p className="eyebrow" data-rv>{pick(u.eyebrow, lang)}</p>
@@ -16,8 +16,7 @@ export default function Usage() {
             <span className="line"><span className="line__i">{pick(u.t1, lang)}</span></span>
             <span className="line"><span className="line__i" style={{ ['--d' as string]: '80ms' }}>{pick(u.t2, lang)}</span></span>
           </h2>
-          <p className="lede mt-7 max-w-[42ch]" data-rv>{pick(u.p1, lang)}</p>
-          <p className="lede mt-4 max-w-[42ch]" data-rv style={{ ['--d' as string]: '90ms' }}>{pick(u.p2, lang)}</p>
+          <p className="lede mt-7 max-w-[42ch]" data-rv>{pick(u.note, lang)}</p>
         </div>
 
         <ol className="flex flex-col">
@@ -25,10 +24,10 @@ export default function Usage() {
             <li
               key={i}
               className="flex gap-6 border-t py-6 first:border-t-0 first:pt-0 md:gap-8 md:py-7"
-              style={{ borderColor: 'color-mix(in srgb, var(--ink) 14%, transparent)', ['--d' as string]: `${i * 110}ms` }}
+              style={{ borderColor: 'color-mix(in srgb, var(--lav) 22%, transparent)', ['--d' as string]: `${i * 110}ms` }}
               data-rv
             >
-              <span className="display shrink-0 text-[2rem] leading-none" style={{ color: 'var(--grape)' }}>
+              <span className="display shrink-0 text-[2rem] leading-none" style={{ color: 'var(--gold)' }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
               <div>

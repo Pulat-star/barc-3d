@@ -32,23 +32,24 @@ export default function Header({ tone = 'ink' }: { tone?: 'ink' | 'white' }) {
   }, [open])
 
   const links = [
-    { href: '/products/', label: pick(nav.products, lang) },
-    { href: '/usage/', label: pick(nav.usage, lang) },
-    { href: '/about/', label: pick(nav.about, lang) }
+    { href: '/mahsulotlar/', label: pick(nav.products, lang) },
+    { href: '/#afzalliklar', label: pick(nav.benefits, lang) },
+    { href: '/#qanday-ishlatiladi', label: pick(nav.usage, lang) },
+    { href: '/#barc-haqida', label: pick(nav.about, lang) }
   ]
 
   return (
     <>
       <header
-        className="absolute inset-x-0 top-0 z-40 h-[88px] md:h-[100px]"
+        className="fixed inset-x-0 top-0 z-40 h-[88px] md:h-[100px]"
         style={{ paddingTop: 'var(--sa-top)' }}
       >
         <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 md:px-12">
           <nav className="flex items-start gap-5 text-[14px] md:gap-[30px]" style={{ color: ink }}>
-            <Link href="/products/" className="group tap leading-[16.8px]">
+            <Link href="/mahsulotlar/" className="group tap leading-[16.8px]">
               <Roll text={pick(nav.products, lang)} />
             </Link>
-            <Link href="/usage/" className="group tap hidden leading-[24px] sm:block">
+            <Link href="/#qanday-ishlatiladi" className="group tap hidden leading-[24px] sm:block">
               <Roll text={pick(nav.usage, lang)} />
             </Link>
           </nav>
@@ -80,7 +81,7 @@ export default function Header({ tone = 'ink' }: { tone?: 'ink' | 'white' }) {
         className="fixed inset-0 z-50 flex flex-col"
         aria-hidden={!open}
         style={{
-          background: 'var(--grape)',
+          background: 'var(--paper-deep)',
           transform: open ? 'translate3d(0,0,0)' : 'translate3d(0,-100%,0)',
           transition: `transform ${open ? '.9s' : '.975s'} var(--ease-page)`,
           visibility: open ? 'visible' : 'hidden',

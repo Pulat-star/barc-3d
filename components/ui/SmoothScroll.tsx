@@ -27,6 +27,9 @@ export default function SmoothScroll() {
       autoRaf: false
     })
     lenis.on('scroll', ScrollTrigger.update)
+    // the pinned gallery's arrows scroll to a position; they need the same
+    // instance, or a native scrollTo fights Lenis for the scroll offset
+    ;(window as unknown as { __lenis?: Lenis }).__lenis = lenis
 
     const tick = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
@@ -34,6 +37,7 @@ export default function SmoothScroll() {
 
     return () => {
       gsap.ticker.remove(tick)
+      delete (window as unknown as { __lenis?: Lenis }).__lenis
       lenis.destroy()
     }
   }, [])

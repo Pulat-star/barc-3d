@@ -273,19 +273,20 @@ export const COPY = {
   },
 
   /* ------------------------------------------------------------------ site
-     Everything the Figma frames spell out: header, gallery chrome, the
-     products index, a product page and its two shared bands. */
+     Every line here is either supplied in the brief or printed on the pack.
+     No origin, no certification, no percentages, no invented claims. */
   site: {
     nav: {
       products: t('Products', 'Mahsulotlar', 'Продукты', 'المنتجات'),
-      usage: t('How to use', 'Foydalanish', 'Применение', 'الاستخدام'),
+      benefits: t('Benefits', 'Afzalliklar', 'Преимущества', 'المزايا'),
+      usage: t('How to use', 'Qanday ishlatiladi', 'Как применять', 'طريقة الاستخدام'),
       about: t('About BÄRC', 'BÄRC haqida', 'О BÄRC', 'عن BÄRC'),
       menu: t('Menu', 'Menyu', 'Меню', 'القائمة'),
       close: t('Close', 'Yopish', 'Закрыть', 'إغلاق')
     },
     home: {
       eyebrow: t('BÄRC · LAUNDRY CAPSULES', 'BÄRC · KIR YUVISH KAPSULALARI', 'BÄRC · КАПСУЛЫ ДЛЯ СТИРКИ', 'BÄRC · كبسولات الغسيل'),
-      /* the slogan is one sentence with one word lifted into italic grape */
+      /* the slogan is one sentence with one word lifted into italic gold */
       s1: t('Win over any', 'Istalgan kir ustidan', 'Победа над любым', 'انتصر على'),
       s2: t('stain', 'g‘alaba', 'пятном', 'أي بقعة'),
       s3: t(' you meet', ' qozoning', '', ''),
@@ -295,30 +296,43 @@ export const COPY = {
         'Bärc — мощный результат и бережный уход.',
         'بيرك — قوة في النتيجة ولطف في العناية.'
       ),
+      note: t(
+        'Capsules made easy for everyday clean. Discover the BÄRC that suits you.',
+        'Kundalik tozalik uchun qulay kapsulalar. O‘zingizga mos BÄRC mahsulotini kashf eting.',
+        'Удобные капсулы для ежедневной чистоты. Найдите свой BÄRC.',
+        'كبسولات عملية لنظافة كل يوم. اكتشف منتج بيرك المناسب لك.'
+      ),
+      cta: t('See the products', 'Mahsulotlarni ko‘rish', 'Посмотреть продукты', 'عرض المنتجات'),
       rotate: t('Turn the\nproducts', 'Mahsulotlarni\naylantiring', 'Листайте\nпродукты', 'قلّب\nالمنتجات'),
       format: t('BÄRC 3in1 PODS', 'BÄRC 3in1 PODS', 'BÄRC 3in1 PODS', 'BÄRC 3in1 PODS'),
       all: t('All products', 'Barcha mahsulotlar', 'Все продукты', 'كل المنتجات'),
-      discover: t('Discover the product', 'Mahsulot bilan tanishish', 'Узнать о продукте', 'تعرّف على المنتج')
+      discover: t('Learn more', 'Batafsil tanishish', 'Подробнее', 'اعرف المزيد')
     },
     products: {
       eyebrow: t('PRODUCTS', 'MAHSULOTLAR', 'ПРОДУКТЫ', 'المنتجات'),
       title: t('Three scents of clean.', 'Tozalikning uch xil ifori.', 'Три аромата чистоты.', 'ثلاث روائح للنظافة.'),
       sub: t(
-        'The result is the same. The scent is your choice.',
-        'Kuchli natija bir xil. Ifor — sizning tanlovingiz.',
-        'Результат один. Аромат — ваш выбор.',
-        'النتيجة واحدة. الرائحة اختيارك.'
+        'Choose the BÄRC that suits you.',
+        'O‘zingizga mos BÄRC mahsulotini tanlang.',
+        'Выберите подходящий вам BÄRC.',
+        'اختر منتج بيرك المناسب لك.'
       ),
       more: t('Learn more', 'Batafsil tanishish', 'Подробнее', 'اعرف المزيد'),
-      units: t('60 pcs · 3in1 PODS', '60 dona · 3in1 PODS', '60 шт · 3in1 PODS', '٦٠ قطعة · 3in1 PODS')
+      /* quantity is read off the pack; the unit word is all that is localised */
+      units: t('pcs · 3in1 PODS', 'dona · 3in1 PODS', 'шт · 3in1 PODS', 'قطعة · 3in1 PODS')
     },
     product: {
       back: t('All products', 'Barcha mahsulotlar', 'Все продукты', 'كل المنتجات'),
-      howto: t('How is it used?', 'Qanday foydalaniladi?', 'Как применять?', 'كيف يُستخدم؟'),
-      spec1: t('3in1 PODS', '3in1 PODS', '3in1 PODS', '3in1 PODS'),
-      spec2: t('60 pcs', '60 dona', '60 шт', '٦٠ قطعة'),
-      spec3: t('Laundry capsules', 'Kir yuvish kapsulalari', 'Капсулы для стирки', 'كبسولات غسيل'),
-      related: t('Discover another scent.', 'Yana bir iforni kashf eting.', 'Откройте другой аромат.', 'اكتشف رائحة أخرى.')
+      howto: t('How is it used?', 'Qanday ishlatiladi?', 'Как применять?', 'كيف يُستخدم؟'),
+      spec: t('3in1 PODS', '3in1 PODS', '3in1 PODS', '3in1 PODS'),
+      kind: t('Laundry capsules', 'Kir yuvish kapsulalari', 'Капсулы для стирки', 'كبسولات غسيل'),
+      related: t('Discover another scent.', 'Yana bir iforni kashf eting.', 'Откройте другой аромат.', 'اكتشف رائحة أخرى.'),
+      metaDesc: t(
+        'BÄRC 3in1 PODS laundry capsules — 60 per pack.',
+        'BÄRC 3in1 PODS kir yuvish kapsulalari — qadoqda 60 dona.',
+        'Капсулы для стирки BÄRC 3in1 PODS — 60 штук в упаковке.',
+        'كبسولات غسيل BÄRC 3in1 PODS — ٦٠ قطعة في العبوة.'
+      )
     },
     benefits: {
       eyebrow: t('3in1 PODS', '3in1 PODS', '3in1 PODS', '3in1 PODS'),
@@ -328,28 +342,28 @@ export const COPY = {
         {
           title: t('Powerful cleaning', 'Kuchli tozalash', 'Мощная очистка', 'تنظيف قوي'),
           body: t(
-            'Everyday stains and stubborn marks are lifted in one wash.',
-            'Kundalik kir va qiyin dog‘lar bir yuvishda ketadi.',
-            'Повседневные загрязнения и стойкие пятна уходят за одну стирку.',
-            'تزول الأوساخ اليومية والبقع العنيدة في غسلة واحدة.'
+            'Tough stains are lifted, even on a cold, short cycle.',
+            'Qiyin dog‘lar sovuq va qisqa dasturda ham ketadi.',
+            'Стойкие пятна уходят даже в холодной короткой программе.',
+            'تزول البقع العنيدة حتى في دورة باردة قصيرة.'
           )
         },
         {
           title: t('Pleasant scent', 'Yoqimli ifor', 'Приятный аромат', 'رائحة منعشة'),
           body: t(
-            'A fresh, long-lasting scent stays in the fabric after drying.',
-            'Quritgandan keyin ham matoda yangi, uzoq saqlanadigan ifor qoladi.',
-            'Свежий стойкий аромат остаётся в ткани после сушки.',
-            'رائحة منعشة تدوم في القماش بعد التجفيف.'
+            'A fresh scent stays in the fabric after the wash.',
+            'Yuvishdan keyin matoda yangi ifor qoladi.',
+            'После стирки в ткани остаётся свежий аромат.',
+            'تبقى رائحة منعشة في القماش بعد الغسل.'
           )
         },
         {
           title: t('Fabric care', 'Matoni asrash', 'Забота о ткани', 'عناية بالقماش'),
           body: t(
-            'Colour and fibre are protected, so clothes keep their shape.',
-            'Rang va tola himoyalanadi, kiyim shaklini yo‘qotmaydi.',
-            'Цвет и волокно под защитой — одежда держит форму.',
-            'يحمي اللون والألياف فيحافظ على شكل الملابس.'
+            'Colour and fibre are looked after wash after wash.',
+            'Rang va tolalar har yuvishda asraladi.',
+            'Цвет и волокна берегутся от стирки к стирке.',
+            'يُحافظ على اللون والألياف غسلة بعد غسلة.'
           )
         }
       ]
@@ -358,71 +372,56 @@ export const COPY = {
       eyebrow: t('EASY EVERY DAY', 'HAR KUNI OSON', 'ПРОСТО КАЖДЫЙ ДЕНЬ', 'سهل كل يوم'),
       t1: t('Three steps', 'Tozalik sari', 'Три шага', 'ثلاث خطوات'),
       t2: t('to clean.', 'uch qadam.', 'к чистоте.', 'إلى النظافة.'),
-      p1: t(
-        'No measuring, no spills. The capsule does the dosing for you.',
-        'O‘lchash shart emas. Kapsula formati kir uvetini quyay va sodda qiladi.',
-        'Не нужно отмерять и ничего не прольётся — капсула дозирует сама.',
-        'لا قياس ولا انسكاب. الكبسولة تتكفّل بالجرعة.'
-      ),
-      p2: t(
-        'Dry hands, capsule into the empty drum, laundry on top, then your usual cycle.',
-        'Qo‘lingiz quruq bo‘lsin, kapsulani bo‘sh barabanga soling, kirni ustiga joylang va odatdagi dasturni tanlang.',
-        'Сухими руками положите капсулу в пустой барабан, сверху бельё, затем обычный режим.',
-        'بيدين جافتين، ضع الكبسولة في الحلة الفارغة، ثم الغسيل فوقها، ثم برنامجك المعتاد.'
+      note: t(
+        'The dosing instruction printed on the pack takes precedence.',
+        'Dozalash bo‘yicha qadoqdagi ko‘rsatma ustuvor.',
+        'Приоритет — указание по дозировке на упаковке.',
+        'تعليمات الجرعة المطبوعة على العبوة هي المرجع.'
       ),
       steps: [
         {
           title: t('Take a capsule', 'Kapsulani oling', 'Возьмите капсулу', 'خذ كبسولة'),
           body: t(
-            'With dry hands — the film only dissolves in water.',
-            'Qo‘l quruq bo‘lsin: plyonka faqat suvda eriydi.',
-            'Руки должны быть сухими: плёнка растворяется только в воде.',
-            'بيدين جافتين — الغشاء يذوب في الماء فقط.'
+            'Take one capsule as the pack instructs.',
+            'Qadoq ko‘rsatmasiga muvofiq kapsulani oling.',
+            'Возьмите капсулу согласно указанию на упаковке.',
+            'خذ كبسولة وفق تعليمات العبوة.'
           )
         },
         {
           title: t('Put it in the drum', 'Barabanga joylashtiring', 'Положите в барабан', 'ضعها في الحلة'),
           body: t(
-            'At the back, before the laundry — never in the detergent tray.',
-            'Kapsulani bo‘sh barabanga soling, keyin kirni joylashtiring.',
-            'В пустой барабан, до белья — не в отсек для порошка.',
-            'في الخلف قبل الغسيل — وليس في درج المسحوق.'
+            'Place the capsule in the drum before the laundry.',
+            'Kapsulani kiyimlardan oldin kir yuvish mashinasi barabaniga joylashtiring.',
+            'Положите капсулу в барабан до белья.',
+            'ضع الكبسولة في الحلة قبل الغسيل.'
           )
         },
         {
-          title: t('Run your normal cycle', 'Mos dasturni tanlang', 'Запустите обычный режим', 'شغّل برنامجك المعتاد'),
+          title: t('Run a suitable cycle', 'Mos dasturda yuving', 'Выберите подходящую программу', 'شغّل برنامجاً مناسباً'),
           body: t(
-            'Cold and short is enough. No pre-soak needed.',
-            'Kiyim yorlig‘i va mahsulot qo‘riqnomasiga mos dasturni yoqing.',
-            'Холодной и короткой программы достаточно. Замачивание не нужно.',
-            'البارد والقصير يكفي. لا حاجة للنقع.'
+            'Wash on a cycle that suits the garment label and the product guidance.',
+            'Kiyim yorlig‘i va mahsulot yo‘riqnomasiga mos dasturda yuving.',
+            'Стирайте по программе, подходящей ярлыку одежды и инструкции продукта.',
+            'اغسل ببرنامج يناسب ملصق الملابس وإرشادات المنتج.'
           )
         }
       ]
     },
-    about: {
+    brand: {
       eyebrow: t('ABOUT BÄRC', 'BÄRC HAQIDA', 'О BÄRC', 'عن BÄRC'),
-      title: t('Strong results, careful care.', 'Kuchli natija, ehtiyotkor parvarish.', 'Сильный результат, бережный уход.', 'نتيجة قوية وعناية لطيفة.'),
-      p1: t(
-        'Bärc is a laundry care brand built on one formula platform. Capsules first, with powder, gel and a stain remover following the same standard.',
-        'Bärc — bitta formula platformasiga qurilgan kir parvarishi brendi. Avval kapsula, keyin shu standart bo‘yicha poroshok, gel va dog‘ ketkazuvchi.',
-        'Bärc — бренд ухода за бельём на одной формульной платформе. Сначала капсулы, затем по тому же стандарту порошок, гель и пятновыводитель.',
-        'بيرك علامة للعناية بالغسيل قائمة على منصة تركيبة واحدة. الكبسولات أولاً، ثم المسحوق والجل ومزيل البقع بالمعيار نفسه.'
-      ),
-      p2: t(
-        'Three scents, one standard of clean — choose by scent, not by strength.',
-        'Uch xil ifor, bitta tozalik standarti — kuch bo‘yicha emas, ifor bo‘yicha tanlang.',
-        'Три аромата, один стандарт чистоты — выбирайте по аромату, а не по силе.',
-        'ثلاث روائح ومعيار نظافة واحد — اختر بالرائحة لا بالقوة.'
+      title: t('BÄRC for everyday care.', 'Kundalik parvarish uchun BÄRC.', 'BÄRC для ежедневного ухода.', 'بيرك للعناية اليومية.'),
+      body: t(
+        'Discover our products and make laundry day easier.',
+        'Kir yuvishni qulayroq qilish uchun mahsulotlarimiz bilan tanishing.',
+        'Познакомьтесь с нашими продуктами и упростите стирку.',
+        'تعرّف على منتجاتنا لتجعل يوم الغسيل أسهل.'
       )
     },
     scent: {
-      amethyst: t('Berry and floral scent', 'Rezavorlar va gullar ifori', 'Ягодно-цветочный аромат', 'رائحة التوت والزهور'),
-      crystal: t('Clean water and blue florals', 'Toza suv va moviy gullar ifori', 'Чистая вода и синие цветы', 'ماء نقي وزهور زرقاء'),
-      original: t('Natural botanical scent', 'Tabiiy o‘simliklar ifori', 'Природный травяной аромат', 'رائحة نباتية طبيعية'),
-      powder: t('Fresh linen scent', 'Yangi choyshab ifori', 'Аромат свежего белья', 'رائحة الكتان المنعش'),
-      gel: t('Soft cotton scent', 'Yumshoq paxta ifori', 'Аромат мягкого хлопка', 'رائحة القطن الناعم'),
-      stain: t('Unscented', 'Ifursiz', 'Без аромата', 'بدون رائحة')
+      amethyst: t('Amethyst scent', 'Amethyst ifori', 'Аромат Amethyst', 'رائحة Amethyst'),
+      'crystal-bloom': t('Crystal Bloom scent', 'Crystal Bloom ifori', 'Аромат Crystal Bloom', 'رائحة Crystal Bloom'),
+      original: t('Original scent', 'Original ifori', 'Аромат Original', 'رائحة Original')
     } as Record<string, Entry>
   }
 } as const
