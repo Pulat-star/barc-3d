@@ -11,21 +11,20 @@
   --ease-mark:cubic-bezier(.22,1,.36,1);        /* markers, small chrome */
   --ease:var(--ease-mark);
 
-  /* Palette — the values given in the brief, taken from the brand's own
-     purple artwork. Measured against --paper: white 18.7:1, --muted 13.0:1,
-     --gold 13.0:1, --lav 6.8:1; white on --grape 6.9:1. --paper-2 sits only
-     1.1:1 off the surface, so panels built from it carry a hairline edge
-     rather than relying on fill alone. */
-  --paper:#1A0735;        /* page surface */
-  --paper-deep:#120427;   /* the deepest well — footer, menu backdrop */
-  --paper-2:#2A0F46;      /* cards, arches, lifted panels */
-  --grape:#7E4096;        /* bright violet accent — dome, bands */
-  --grape-deep:#5E2C72;   /* pressed grape */
-  --lav:#B58BDC;          /* soft lavender accent */
-  --ink:#FFFFFF;          /* primary type */
-  --muted:#DED3EB;        /* secondary type */
-  --gold:#FFD33D;         /* small pack-related emphasis only */
-  --accent:var(--gold);
+  /* Palette. The Figma file is drawn in pink on a pale ground; the brief is
+     that same design with the pink replaced by deep purple, so every token is
+     the identical colour rotated 335deg -> 272deg and the lead tone darkened
+     until it reads as "to'q binafsha". The page stays light and airy, exactly
+     as the file is drawn. Measured on --paper: --ink 11.8:1, --muted 4.9:1,
+     --grape 6.1:1; white on --grape 8.1:1. */
+  --paper:#E8DAF8;        /* page surface            (Figma --paper #f9c6dc) */
+  --paper-2:#F3EAFC;      /* cards, arches, wells */
+  --grape:#7115C1;        /* the lead colour         (Figma --pink  #e93783) */
+  --grape-deep:#561093;   /* pressed grape */
+  --ink:#2D174B;          /* type                    (Figma --ink   #4b1732) */
+  --muted:#645879;        /* secondary type          (Figma --muted #79586b) */
+  --accent:var(--grape);   /* the Figma lifts its one word in the lead colour */
+  --lav:#B58BDC;
   --white:#FFFFFF;
 
   --radius-full:999px;
@@ -33,11 +32,11 @@
   --space-14:14px;
   --space-26:26px;
   /* Figma effect "BÄRC/Product depth", shadow colour rotated to match */
-  --depth:14px 28px 26px rgba(0,0,0,.45);
+  --depth:14px 28px 24px rgba(45,23,75,.22);
 
   --sa-top:env(safe-area-inset-top,0px);
   --sa-bot:env(safe-area-inset-bottom,0px);
-  color-scheme:dark;
+  color-scheme:light;
 }
 
 *{box-sizing:border-box}
@@ -82,8 +81,8 @@ a{color:inherit;text-decoration:none}
     transition:transform .42s var(--ease-mark), background-color .18s linear, color .18s linear;
   }
   .btn:hover{ transform:translateY(-2px); }
-  .btn-white{ background:var(--white); color:var(--paper); }
-  .btn-white:hover{ background:#EDE2FA; }
+  .btn-white{ background:var(--white); color:var(--ink); }
+  .btn-white:hover{ background:#F6EFFD; }
   .btn-grape{ background:var(--grape); color:var(--white); }
   .btn-grape:hover{ background:var(--grape-deep); }
   .btn-line{ border:1px solid color-mix(in srgb, var(--ink) 22%, transparent); color:var(--ink); }
@@ -92,7 +91,6 @@ a{color:inherit;text-decoration:none}
   /* the arch the product cards and the product hero sit in */
   .arch{
     background:var(--paper-2);
-    border:1px solid color-mix(in srgb, var(--lav) 22%, transparent);
     border-radius:999px 999px var(--round) var(--round);
   }
 }
@@ -146,7 +144,7 @@ html.is-rtl .no-flip { direction: ltr; }
 /* keyboard focus: the browser default is a dark ring on a dark page, so it is
    replaced with the gold the brand already uses for emphasis */
 :focus-visible{
-  outline:2px solid var(--gold);
+  outline:2px solid var(--grape);
   outline-offset:3px;
   border-radius:4px;
 }

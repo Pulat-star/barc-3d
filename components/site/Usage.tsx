@@ -27,7 +27,7 @@ export default function Usage({ id }: { id?: string }) {
               style={{ borderColor: 'color-mix(in srgb, var(--lav) 22%, transparent)', ['--d' as string]: `${i * 110}ms` }}
               data-rv
             >
-              <span className="display shrink-0 text-[2rem] leading-none" style={{ color: 'var(--gold)' }}>
+              <span className="display shrink-0 text-[2rem] leading-none" style={{ color: 'var(--accent)' }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
               <div>

@@ -4,20 +4,18 @@ import Link from 'next/link'
 import { RELEASED } from '@/lib/products'
 import { COPY, pick } from '@/lib/copy'
 import { useLang } from '@/components/ui/LangContext'
-import { gsap, ScrollTrigger, registerGsap } from '@/lib/masterTimeline'
 
 /** Only the released scents ride the gallery. */
 const SHOWN = RELEASED
 
 /**
- * The home screen, pinned.
+ * The home gallery, as the Figma frame draws it: one pack centred on the dome,
+ * its neighbours tilted away and cropped by the viewport.
  *
- * Scrolling does not move the page — it turns the carousel, as on the
- * reference. The section is one screen tall per product; that run of scroll is
- * consumed in place and the progress through it decides which pack leads.
- * Arrows and the indicators scroll to the matching position rather than setting
- * state directly, so there is one source of truth and they can never disagree
- * with the scrollbar.
+ * Scrolling is left alone — the page scrolls normally and the carousel is moved
+ * by the arrows, the indicators, a swipe or the arrow keys. The packs transition
+ * between slots rather than being re-laid out, so a change reads as one object
+ * travelling rather than three being swapped.
  */
 export default function Gallery() {
   const { lang } = useLang()
@@ -25,72 +23,44 @@ export default function Gallery() {
   const home = site.home
   const n = SHOWN.length
 
-  const section = useRef<HTMLElement>(null)
-  const pin = useRef<HTMLDivElement>(null)
-  const trigger = useRef<ScrollTrigger | null>(null)
   const [active, setActive] = useState(0)
+  const drag = useRef<{ x: number; on: boolean }>({ x: 0, on: false })
 
-  useEffect(() => {
-    registerGsap()
-    const sec = section.current
-    const pinEl = pin.current
-    if (!sec || !pinEl) return
-    // without the pin there is no scroll to read, so the arrows drive state
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    const ctx = gsap.context(() => {
-      trigger.current = ScrollTrigger.create({
-        trigger: sec,
-        start: 'top top',
-        end: 'bottom bottom',
-        pin: pinEl,
-        pinSpacing: false,
-        scrub: true,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const i = Math.min(n - 1, Math.floor(self.progress * n))
-          setActive((prev) => (prev === i ? prev : i))
-        }
-      })
-    }, sec)
-
-    return () => { trigger.current = null; ctx.revert() }
-  }, [n])
-
-  /** Scroll to the middle of slot `i`; the trigger then sets the state. */
-  const goTo = useCallback((i: number) => {
-    const st = trigger.current
-    const next = (i + n) % n
-    if (!st) { setActive(next); return }
-    const y = st.start + (st.end - st.start) * ((next + 0.5) / n)
-    const lenis = (window as unknown as { __lenis?: { scrollTo: (y: number, o?: object) => void } }).__lenis
-    if (lenis) lenis.scrollTo(y, { duration: 1.1 })
-    else window.scrollTo({ top: y, behavior: 'smooth' })
-  }, [n])
+  const goTo = useCallback((i: number) => setActive(((i % n) + n) % n), [n])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') goTo(active + 1)
-      if (e.key === 'ArrowLeft') goTo(active - 1)
+      if (e.key === 'ArrowRight') setActive((a) => (a + 1) % n)
+      if (e.key === 'ArrowLeft') setActive((a) => (a - 1 + n) % n)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [goTo, active])
+  }, [n])
+
+  // a swipe moves one slot; the threshold keeps a vertical scroll from counting
+  const onDown = (x: number) => { drag.current = { x, on: true } }
+  const onUp = (x: number) => {
+    if (!drag.current.on) return
+    const dx = x - drag.current.x
+    drag.current.on = false
+    if (Math.abs(dx) > 44) setActive((a) => (a + (dx < 0 ? 1 : -1) + n) % n)
+  }
 
   const product = SHOWN[active]
   const scent = site.scent[product.slug]
 
   return (
     <section
-      ref={section}
-      className="relative [--slot:46vw] md:[--slot:24vw]"
-      style={{ height: `${n * 100}svh` }}
+      className="relative select-none [--slot:46vw] md:[--slot:24vw]"
+      onPointerDown={(e) => onDown(e.clientX)}
+      onPointerUp={(e) => onUp(e.clientX)}
+      onPointerCancel={() => { drag.current.on = false }}
     >
-      <div ref={pin} className="relative flex h-[100svh] select-none flex-col overflow-hidden">
+      <div className="relative flex flex-col overflow-hidden">
         {/* the slogan stays put while the packs turn underneath it */}
         <div
-          className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-[14px] px-6 text-center md:gap-[18px] md:px-12"
-          style={{ paddingTop: 'calc(88px + var(--sa-top) + 1.75rem)' }}
+          className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-3 px-6 text-center md:gap-[18px] md:px-12"
+          style={{ paddingTop: 'calc(88px + var(--sa-top) + 1.25rem)', paddingBottom: '0.5rem' }}
         >
           <p className="eyebrow" data-rv>{pick(home.eyebrow, lang)}</p>
           <h1 className="display mx-auto max-w-[1100px] text-[clamp(2.1rem,6.4vw,5.75rem)]">
@@ -105,31 +75,23 @@ export default function Gallery() {
           <p className="lede max-w-[800px]" data-rv style={{ ['--d' as string]: '160ms' }}>
             {pick(home.promise, lang)}
           </p>
-          {/* the extra line only appears where there is height to spare, so it
-              can never crowd the pack */}
-          <p
-            className="lede hidden max-w-[62ch] [@media(min-height:860px)]:block"
-            data-rv
-            style={{ ['--d' as string]: '220ms' }}
-          >
-            {pick(home.note, lang)}
-          </p>
         </div>
 
-        {/* the dome: a single ellipse bleeding past both edges */}
-        <div className="relative flex-1">
+        {/* The dome is the Figma ellipse, not an approximated curve: 1800x1000
+            on a 1440 frame, so it overhangs 180px each side and only its crown
+            shows. As fractions that is 125% wide and 285% of the pack row tall,
+            with its top edge 61% of the way down that row. */}
+        {/* this zone clips the dome, so the ellipse can run past the caption
+            without painting over the control rows that follow */}
+        <div className="relative overflow-hidden">
           <div
             aria-hidden
-            className="pointer-events-none absolute bottom-0 top-[44%]"
-            style={{
-              left: '-12.5vw', right: '-12.5vw',
-              background: 'var(--grape)',
-              borderRadius: '50% 50% 0 0 / 38% 38% 0 0'
-            }}
+            className="pointer-events-none absolute left-[-12.5vw] right-[-12.5vw] top-[36%] h-[200%] rounded-[50%]"
+            style={{ background: 'var(--grape)' }}
           />
 
-          {/* the packs */}
-          <div className="relative mx-auto h-[62%] max-w-[1440px]">
+          <div className="relative mx-auto h-[clamp(230px,24.5vw,352px)] max-w-[1440px]">
+            {/* the packs */}
             {SHOWN.map((p, i) => {
               // -1, 0, +1 around the active slot, wrapping both ways
               let o = i - active
@@ -143,7 +105,7 @@ export default function Gallery() {
                   style={{
                     // sized by height, not width: a width-driven pouch overflows
                     // its row and loses the child-lock strip off the top
-                    height: lead ? '100%' : '78%',
+                    height: lead ? '100%' : '77%',
                     transform: `translate3d(calc(-50% + ${o} * var(--slot)), ${lead ? 0 : -4}%, 0) rotate(${o * 12}deg)`,
                     opacity: lead ? 1 : 0.9,
                     zIndex: lead ? 2 : 1,
@@ -169,7 +131,7 @@ export default function Gallery() {
               {product.name}
             </h2>
             <p className="text-[13px] leading-[18.2px]" style={{ color: 'rgba(255,255,255,.88)' }}>
-              {scent && pick(scent, lang)} · {product.quantity} {pick(site.products.units, lang)}
+              {scent && pick(scent, lang)} · {product.quantity} {pick(site.products.units, lang).split('·')[0].trim()}
             </p>
             <Link href={`/mahsulotlar/${product.slug}/`} className="btn btn-white mt-2">
               {pick(home.discover, lang)}
@@ -222,8 +184,9 @@ export default function Gallery() {
           style={{ background: 'var(--paper)', paddingBottom: 'calc(1rem + var(--sa-bot))' }}
         >
           <p style={{ color: 'var(--muted)' }}>{pick(home.format, lang)}</p>
-          <Link href="/mahsulotlar/" className="btn btn-grape">
-            {pick(home.cta, lang)}
+          <Link href="/mahsulotlar/" className="group tap inline-flex items-center gap-2" style={{ color: 'var(--ink)' }}>
+            <span className="marker" />
+            {pick(home.all, lang)}
           </Link>
         </div>
       </div>

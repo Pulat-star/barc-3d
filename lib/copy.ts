@@ -419,9 +419,10 @@ export const COPY = {
       )
     },
     scent: {
-      amethyst: t('Amethyst scent', 'Amethyst ifori', 'Аромат Amethyst', 'رائحة Amethyst'),
-      'crystal-bloom': t('Crystal Bloom scent', 'Crystal Bloom ifori', 'Аромат Crystal Bloom', 'رائحة Crystal Bloom'),
-      original: t('Original scent', 'Original ifori', 'Аромат Original', 'رائحة Original')
+      /* wording taken from the client's own Figma file, not invented here */
+      amethyst: t('Berry and floral scent', 'Rezavorlar va gullar ifori', 'Ягодно-цветочный аромат', 'رائحة التوت والزهور'),
+      'crystal-bloom': t('Clean water and blue florals', 'Toza suv va moviy gullar ifori', 'Чистая вода и синие цветы', 'ماء نقي وزهور زرقاء'),
+      original: t('Natural botanical scent', 'Tabiiy o‘simliklar ifori', 'Природный травяной аромат', 'رائحة نباتية طبيعية')
     } as Record<string, Entry>
   }
 } as const

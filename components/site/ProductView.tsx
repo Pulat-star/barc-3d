@@ -39,7 +39,7 @@ export default function ProductView({ slug }: { slug: string }) {
             </h1>
 
             {scent && (
-              <p className="mt-3 text-[clamp(1rem,1.5vw,1.2rem)]" style={{ color: 'var(--gold)' }} data-rv>
+              <p className="mt-3 text-[clamp(1rem,1.5vw,1.2rem)]" style={{ color: 'var(--accent)' }} data-rv>
                 {pick(scent, lang)}
               </p>
             )}

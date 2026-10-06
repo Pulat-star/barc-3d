@@ -56,10 +56,7 @@ export const PRODUCTS: Product[] = [
     name: 'Amethyst',
     description: PACK_CLAIM,
     packagingColor: '#5B2150',
-    images: {
-      front: asset('products/amethyst.webp'),
-      extra: [asset('products/amethyst-closeup.webp')]
-    },
+    images: { front: asset('products/amethyst.webp') },
     quantity: 60,
     benefits: [0, 1, 2],
     usage: [0, 1, 2],
