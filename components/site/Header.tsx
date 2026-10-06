@@ -15,6 +15,16 @@ import CloseIcon from '@/components/ui/CloseIcon'
 export default function Header({ tone = 'ink' }: { tone?: 'ink' | 'white' }) {
   const { lang, setLang } = useLang()
   const [open, setOpen] = useState(false)
+  const [solid, setSolid] = useState(false)
+
+  // the bar is fixed, so once the page moves it needs its own surface or the
+  // logo and links sit straight on top of the copy underneath
+  useEffect(() => {
+    const onScroll = () => setSolid(window.scrollY > 12)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   const nav = COPY.site.nav
   const ink = tone === 'white' ? 'var(--white)' : 'var(--ink)'
 
@@ -42,9 +52,18 @@ export default function Header({ tone = 'ink' }: { tone?: 'ink' | 'white' }) {
     <>
       <header
         className="fixed inset-x-0 top-0 z-40 h-[88px] md:h-[100px]"
-        style={{ paddingTop: 'var(--sa-top)' }}
+        style={{
+          paddingTop: 'var(--sa-top)',
+          background: solid ? 'color-mix(in srgb, var(--paper) 88%, transparent)' : 'transparent',
+          backdropFilter: solid ? 'blur(12px)' : 'none',
+          WebkitBackdropFilter: solid ? 'blur(12px)' : 'none',
+          borderBottom: solid ? '1px solid color-mix(in srgb, var(--lav) 16%, transparent)' : '1px solid transparent',
+          transition: 'background .3s linear, border-color .3s linear'
+        }}
       >
-        <div className="mx-auto flex h-full max-w-[1440px] items-center justify-between px-6 md:px-12">
+        {/* three equal columns, so the logo is centred on the page and not on
+            whatever is left over between two differently sized side slots */}
+        <div className="mx-auto grid h-full max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-6 md:px-12">
           <nav className="flex items-start gap-5 text-[14px] md:gap-[30px]" style={{ color: ink }}>
             <Link href="/mahsulotlar/" className="group tap leading-[16.8px]">
               <Roll text={pick(nav.products, lang)} />
@@ -54,7 +73,7 @@ export default function Header({ tone = 'ink' }: { tone?: 'ink' | 'white' }) {
             </Link>
           </nav>
 
-          <Link href="/" aria-label="BÄRC" className="shrink-0">
+          <Link href="/" aria-label="BÄRC" className="shrink-0 justify-self-center">
             <img
               src={asset('barc-logo.png')}
               alt="BÄRC"
@@ -67,7 +86,7 @@ export default function Header({ tone = 'ink' }: { tone?: 'ink' | 'white' }) {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 text-[14px] leading-[16.8px]"
+            className="flex items-center gap-2 justify-self-end text-[14px] leading-[16.8px]"
             style={{ color: ink }}
           >
             {pick(nav.menu, lang)}

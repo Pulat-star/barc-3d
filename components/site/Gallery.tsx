@@ -23,6 +23,7 @@ export default function Gallery() {
   const home = site.home
   const n = SHOWN.length
 
+  const section = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
   const drag = useRef<{ x: number; on: boolean }>({ x: 0, on: false })
 
@@ -35,6 +36,37 @@ export default function Gallery() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  }, [n])
+
+  /**
+   * Scrolling past the gallery turns it. The page is never pinned or slowed —
+   * the scroll position is only read, so the carousel advances as the hero
+   * leaves the screen and rewinds on the way back up.
+   */
+  useEffect(() => {
+    const sec = section.current
+    if (!sec) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let frame = 0
+    const read = () => {
+      frame = 0
+      const top = sec.getBoundingClientRect().top + window.scrollY
+      const travelled = window.scrollY - top
+      // one slot per 40% of a viewport; the last slot holds while the hero
+      // finishes leaving, so the third pack is never a flash
+      const step = Math.max(220, window.innerHeight * 0.4)
+      const i = Math.min(n - 1, Math.max(0, Math.floor(travelled / step) + 0))
+      if (travelled < -window.innerHeight) return
+      setActive((prev) => (prev === i ? prev : i))
+    }
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(read) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    read()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame) cancelAnimationFrame(frame)
+    }
   }, [n])
 
   // a swipe moves one slot; the threshold keeps a vertical scroll from counting
@@ -51,6 +83,7 @@ export default function Gallery() {
 
   return (
     <section
+      ref={section}
       className="relative select-none [--slot:46vw] md:[--slot:24vw]"
       onPointerDown={(e) => onDown(e.clientX)}
       onPointerUp={(e) => onUp(e.clientX)}
@@ -101,7 +134,15 @@ export default function Gallery() {
               return (
                 <div
                   key={p.slug}
-                  className="absolute bottom-0 left-1/2 will-change-transform"
+                  role={lead ? undefined : 'button'}
+                  tabIndex={lead ? -1 : 0}
+                  aria-label={lead ? undefined : `${p.name} — markazga olib kelish`}
+                  onClick={() => { if (!lead) setActive(i) }}
+                  onKeyDown={(e) => {
+                    if (lead) return
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActive(i) }
+                  }}
+                  className={`absolute bottom-0 left-1/2 will-change-transform ${lead ? '' : 'cursor-pointer'}`}
                   style={{
                     // sized by height, not width: a width-driven pouch overflows
                     // its row and loses the child-lock strip off the top
@@ -112,14 +153,27 @@ export default function Gallery() {
                     transition: 'transform .9s var(--ease-page), opacity .42s linear, height .9s var(--ease-page)'
                   }}
                 >
-                  <img
-                    src={p.images.front}
-                    alt={`BÄRC ${p.name} — 3in1 PODS kir yuvish kapsulalari`}
-                    className="depth h-full w-auto object-contain"
-                    style={{ maxWidth: 'none' }}
-                    loading={i === 0 ? 'eager' : 'lazy'}
-                    draggable={false}
-                  />
+                  {lead ? (
+                    <Link href={`/mahsulotlar/${p.slug}/`} aria-label={`${p.name} sahifasi`} className="block h-full">
+                      <img
+                        src={p.images.front}
+                        alt={`BÄRC ${p.name} — 3in1 PODS kir yuvish kapsulalari`}
+                        className="depth h-full w-auto object-contain"
+                        style={{ maxWidth: 'none' }}
+                        loading="eager"
+                        draggable={false}
+                      />
+                    </Link>
+                  ) : (
+                    <img
+                      src={p.images.front}
+                      alt={`BÄRC ${p.name} — 3in1 PODS kir yuvish kapsulalari`}
+                      className="depth h-full w-auto object-contain"
+                      style={{ maxWidth: 'none' }}
+                      loading="lazy"
+                      draggable={false}
+                    />
+                  )}
                 </div>
               )
             })}
